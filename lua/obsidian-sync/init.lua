@@ -6,14 +6,34 @@ local api_env_var_name = "OBSIDIAN_REST_API_KEY"
 
 local default_config = {
 	obsidian_server_address = "http://localhost:27123",
+	vault_path = nil,
 }
 
 api.nvim_create_augroup("obsidian-sync.nvim", {
 	clear = true,
 })
 
+local function url_encode(s)
+	local jq = "jq"
+	local jq_args = { "-Rj", "@uri" }
+	return vim.fn.system({ jq, unpack(jq_args) }, s)
+end
+
+local function url_encode_path(path)
+	local split_path = vim.fn.split(path, "/", false)
+	local encoded_split_path = {}
+	for _, subpath in ipairs(split_path) do
+		encoded_split_path[#encoded_split_path + 1] = url_encode(subpath)
+	end
+	return vim.fn.join(encoded_split_path, "/")
+end
+
 function M.setup(config)
 	local final_config = vim.tbl_extend("keep", config or {}, default_config)
+	if final_config.vault_path == nil then
+		vim.api.nvim_err_writeln("Error: vault_path is not set in obsidian_sync config.")
+		return
+	end
 
 	api.nvim_create_autocmd("BufEnter", {
 		callback = function()
@@ -33,16 +53,23 @@ function M.setup(config)
 				return
 			end
 
+			local vault_path = vim.fn.expand(final_config.vault_path)
+			local file_vault_rel_path = filename_incl_path:gsub(vault_path, "", 1)
+
 			local server_address = final_config.obsidian_server_address
-			local filename = string.match(filename_incl_path, ".+/(.+)$")
-			local url = server_address .. "/open/" .. filename
-			local authToken = "Bearer " .. api_key
-			local request = 'curl -s -X POST -H "Content-Type: application/json" -H "Authorization: '
-				.. authToken
-				.. '" '
-				.. url
-				.. " >/dev/null"
-			local handle = io.popen(request)
+			local url = server_address .. "/open/" .. url_encode_path(file_vault_rel_path)
+			local curl = "curl"
+			local curl_args = {
+				"-s",
+				"-X POST",
+				"-H",
+				'"Content-Type: application/json"',
+				"-H",
+				'"Authorization: Bearer ' .. api_key .. '"',
+				url,
+				">/dev/null",
+			}
+			local handle = io.popen(curl .. " " .. vim.fn.join(curl_args, " "))
 			if handle ~= nil then
 				local result = handle:read("*a")
 				handle:close()
