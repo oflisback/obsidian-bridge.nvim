@@ -41,7 +41,6 @@ function M.setup(config)
 				.. authToken
 				.. '" '
 				.. url
-				.. " >/dev/null"
 			local handle = io.popen(request)
 			if handle ~= nil then
 				local result = handle:read("*a")
