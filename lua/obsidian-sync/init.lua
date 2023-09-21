@@ -1,4 +1,5 @@
 local api = vim.api
+local util = require("obsidian-sync.util")
 
 local M = {}
 
@@ -35,7 +36,7 @@ function M.setup(config)
 
 			local server_address = final_config.obsidian_server_address
 			local filename = string.match(filename_incl_path, ".+/(.+)$")
-			local url = server_address .. "/open/" .. filename
+			local url = util.EncodeURI(server_address .. "/open/" .. filename)
 			local authToken = "Bearer " .. api_key
 			local request = 'curl -s -X POST -H "Content-Type: application/json" -H "Authorization: '
 				.. authToken
