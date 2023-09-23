@@ -66,6 +66,7 @@ If no config parameter is provided to the setup function this default configurat
 ```lua
 {
   obsidian_server_address = "http://localhost:27123"
+  sync_scroll = false -- See "Sync of buffer scrolling" section below
 }
 ```
 
@@ -81,6 +82,31 @@ Pass a config table as parameter to the setup function to provide an alternative
 }
 ```
 
+### Sync of buffer scrolling
+
+Ideally scrolling within a note in neovim should also make the scroll position be centered in Obsidian. This is possible, but requires a patched version of [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) so we'll have to build it ourselves. For more info about the patch's status see this [discussion](https://github.com/coddingtonbear/obsidian-local-rest-api/discussions/75).
+
+Specifically what's required is a build that includes [this commit](https://github.com/coddingtonbear/obsidian-local-rest-api/compare/main...oflisback:obsidian-local-rest-api:main) which hopefully can get integrated in the upstream project eventually.
+
+Start off by cloning the [patched fork](https://github.com/oflisback/obsidian-local-rest-api). An important gotcha is that Local REST API has a dependency on "master" for "obsidian". But "master" has been updated since that dependency was pinned to a certain checksum in package-lock.json. The quick fix is to `rm package-lock.json` and then `npm install` again.
+
+Next you'll have to remove @types/node dev dependency and make it a regular dependency:
+
+```
+npm remove @types/node
+npm add @types/node
+```
+
+After that the plugin can be built with `npm run build`.
+
+Now that you've built your own version of the plugin, uninstall the original plugin and place the obsidian-local-rest-api in your vault-dir's `.obsidian/plugins/` folder.
+
+Remember to enable the server type needed in the plugin settings inside Obsidian.
+
+The final thing to do is to set `scroll_sync = true` in your obsidian-sync configuration.
+
+Now scrolling a note in neovim should also result in scrolling in Obsidian. Note however that this only works if the note is in <b>editing mode</b> in Obsidian. Any suggestions on how to make it work also in view mode would be very appreciated. :)
+
 ### Contributing
 
 Contributions, bug reports and suggestions are very welcome.
@@ -90,4 +116,3 @@ If you have a suggestion that would make the project better, please fork the rep
 ### Future
 
 - [ ] Detect if a file is located inside an Obsidian vault or not.
-- [ ] Scroll to corresponding line on Neovim navigation events. If the user views line <i>n</i> in Neovim, scroll to line <i>n</i> also in Obsidian.

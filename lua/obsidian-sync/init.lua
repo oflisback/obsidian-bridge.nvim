@@ -1,74 +1,74 @@
 local api = vim.api
-local util = require("obsidian-sync.util")
+local config = require("obsidian-sync.config")
+local network = require("obsidian-sync.network")
 
 local M = {}
 
-local api_env_var_name = "OBSIDIAN_REST_API_KEY"
-
-local default_config = {
-	obsidian_server_address = "http://localhost:27123",
-}
+local configuration = nil
 
 api.nvim_create_augroup("obsidian-sync.nvim", {
 	clear = true,
 })
 
-local function open_in_obsidian(filename, final_config, api_key)
-	local server_address = final_config.obsidian_server_address
-	local url = util.EncodeURI(server_address .. "/open/" .. filename)
-	local authToken = "Bearer " .. api_key
-	local request = 'curl -s -X POST -H "Content-Type: application/json" -H "Authorization: '
-		.. authToken
-		.. '" '
-		.. url
-	local handle = io.popen(request)
-	if handle ~= nil then
-		local result = handle:read("*a")
-		handle:close()
-		if result ~= nil and result ~= "" then
-			local decoded = vim.json.decode(result)
-			-- Ignore other errors for now, for instance if we can't contact obsidian server it's
-			-- not running, that's often times probably intentional.
-			if decoded.errorCode == 40101 then
-				vim.api.nvim_err_writeln(
-					"Error: authentication error, please check your " .. api_env_var_name .. " value."
-				)
-			end
+local function get_active_buffer_markdown_filename()
+	local bufnr = vim.api.nvim_get_current_buf()
+	local filename_incl_path = vim.api.nvim_buf_get_name(bufnr)
+	if filename_incl_path == nil or string.sub(filename_incl_path, -3) ~= ".md" then
+		return nil
+	end
+	return string.match(filename_incl_path, ".+/(.+)$")
+end
+
+local function on_buf_enter()
+	local filename = get_active_buffer_markdown_filename()
+	if filename == nil then
+		return
+	end
+
+	-- Reset prev_line when we swap buffers, we can't be sure that we
+	-- can skip scrolling, setting to nil to make sure we always scroll on
+	-- first vertical cursor movement.
+	vim.b.prev_line = nil
+
+	local api_key = config.get_api_key()
+	if api_key ~= nil then
+		network.open_in_obsidian(filename, configuration, api_key)
+	end
+end
+
+local function on_cursor_moved()
+	if get_active_buffer_markdown_filename() == nil then
+		return
+	end
+
+	local cursor = vim.api.nvim_win_get_cursor(0)
+	local line = cursor[1]
+
+	if vim.b.prev_line == nil or line ~= vim.b.prev_line then
+		local api_key = config.get_api_key()
+		if api_key ~= nil then
+			network.scroll_into_view(line, configuration, api_key)
+			vim.b.prev_line = line
 		end
 	end
 end
 
-function M.setup(config)
-	local final_config = vim.tbl_extend("keep", config or {}, default_config)
+function M.setup(user_config)
+	configuration = config.get_final_config(user_config)
 
 	api.nvim_create_autocmd("BufEnter", {
-		callback = function()
-			-- Check if we are entering a markdown file, if not, early return.
-			local bufnr = vim.api.nvim_get_current_buf()
-			local filename_incl_path = vim.api.nvim_buf_get_name(bufnr)
-			if filename_incl_path == nil or string.sub(filename_incl_path, -3) ~= ".md" then
-				-- Silently ignore files without .md extension.
-				return
-			end
-
-			-- Check if the API key has been set, otherwise notify.
-			local api_key = os.getenv(api_env_var_name)
-			if api_key == nil then
-				vim.api.nvim_err_writeln("Error: " .. api_env_var_name .. " environment variable is not set.")
-				vim.api.nvim_out_write(
-					"Please set the "
-						.. api_env_var_name
-						.. " environment variable to use the obsidian-sync.nvim plugin.\n"
-				)
-				return
-			end
-
-			local filename = string.match(filename_incl_path, ".+/(.+)$")
-			open_in_obsidian(filename, final_config, api_key)
-		end,
+		callback = on_buf_enter,
 		pattern = "*",
 		group = "obsidian-sync.nvim",
 	})
+
+	if configuration.scroll_sync then
+		api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+			callback = on_cursor_moved,
+			pattern = "*",
+			group = "obsidian-sync.nvim",
+		})
+	end
 
 	return M
 end
