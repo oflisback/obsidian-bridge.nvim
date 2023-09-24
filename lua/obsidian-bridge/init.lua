@@ -1,12 +1,12 @@
 local api = vim.api
-local config = require("obsidian-sync.config")
-local network = require("obsidian-sync.network")
+local config = require("obsidian-bridge.config")
+local network = require("obsidian-bridge.network")
 
 local M = {}
 
 local configuration = nil
 
-api.nvim_create_augroup("obsidian-sync.nvim", {
+api.nvim_create_augroup("obsidian-bridge.nvim", {
 	clear = true,
 })
 
@@ -56,26 +56,26 @@ end
 function M.setup(user_config)
 	configuration = config.get_final_config(user_config)
 
-	function ObsidianSyncDailyNote()
+	function ObsidianBridgeDailyNote()
 		local api_key = config.get_api_key()
 		if api_key ~= nil then
 			network.daily_note(configuration, api_key)
 		end
 	end
 	-- Register the command
-	vim.cmd("command! ObsidianSyncDailyNote lua ObsidianSyncDailyNote()")
+	vim.cmd("command! ObsidianBridgeDailyNote lua ObsidianBridgeDailyNote()")
 
 	api.nvim_create_autocmd("BufEnter", {
 		callback = on_buf_enter,
 		pattern = "*",
-		group = "obsidian-sync.nvim",
+		group = "obsidian-bridge.nvim",
 	})
 
 	if configuration.scroll_sync then
 		api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
 			callback = on_cursor_moved,
 			pattern = "*",
-			group = "obsidian-sync.nvim",
+			group = "obsidian-bridge.nvim",
 		})
 	end
 

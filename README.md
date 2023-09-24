@@ -8,13 +8,13 @@ This is accomplished by leveraging the [Local REST API](https://github.com/coddi
 
 ### :movie_camera: Demo
 
-![demo](assets/obsidian-sync.gif?raw=true)
+![demo](assets/obsidian-bridge.gif?raw=true)
 
 ### :mechanic: Installation
 
 1. Make sure you have [curl](https://curl.se/) installed on your system and available on your `PATH`.
 
-2. Install and enable the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) community plugin in Obsidian. The default configuration of obsidian-sync.nvim will try to connect to the non-encrypted server variant so remember to enable that in the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) settings if you want to use it.
+2. Install and enable the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) community plugin in Obsidian. The default configuration of obsidian-bridge.nvim will try to connect to the non-encrypted server variant so remember to enable that in the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) settings if you want to use it.
 
 3. Set the environment variable `OBSIDIAN_REST_API_KEY` to the API key found in the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) settings within Obsidian, for example:
 
@@ -22,15 +22,15 @@ This is accomplished by leveraging the [Local REST API](https://github.com/coddi
 export OBSIDIAN_REST_API_KEY=<your api key, without the brackets>
 ```
 
-4. Install `obsidian-sync.nvim`, here are examples for some popular package managers:
+4. Install `obsidian-bridge.nvim`, here are examples for some popular package managers:
 
 <details>
   <summary>Lazy</summary>
 
 ```lua
 {
-  "oflisback/obsidian-sync.nvim",
-  config = function() require("obsidian-sync").setup() end,
+  "oflisback/obsidian-bridge.nvim",
+  config = function() require("obsidian-bridge").setup() end,
   lazy = false
 }
 ```
@@ -43,8 +43,8 @@ export OBSIDIAN_REST_API_KEY=<your api key, without the brackets>
 ```lua
 require('packer').startup(function()
     use {
-      'oflisback/obsidian-sync.nvim',
-      config = function() require('obsidian-sync').setup() end
+      'oflisback/obsidian-bridge.nvim',
+      config = function() require('obsidian-bridge').setup() end
     }
 end)
 ```
@@ -54,7 +54,7 @@ end)
   <summary>vim-plug</summary>
 
 ```vim
-Plug 'oflisback/obsidian-sync.nvim'
+Plug 'oflisback/obsidian-bridge.nvim'
 ```
 
 </details>
@@ -66,7 +66,7 @@ If no config parameter is provided to the setup function this default configurat
 ```lua
 {
   obsidian_server_address = "http://localhost:27123"
-  sync_scroll = false -- See "Sync of buffer scrolling" section below
+  scroll_sync = false -- See "Sync of buffer scrolling" section below
 }
 ```
 
@@ -74,8 +74,8 @@ Pass a config table as parameter to the setup function to provide an alternative
 
 ```lua
 {
-  "oflisback/obsidian-sync.nvim",
-  config = function() require("obsidian-sync").setup({
+  "oflisback/obsidian-bridge.nvim",
+  config = function() require("obsidian-bridge").setup({
     obsidian_server_address = "https://localhost:27124"
   }) end,
   lazy = false
@@ -84,7 +84,7 @@ Pass a config table as parameter to the setup function to provide an alternative
 
 ### :keyboard: Commands
 
- * `:ObsidianSyncDailyNote` takes you to your daily note or generates it for you if it doesn't already exist. Make sure to have the Daily Notes core plugin enabled in Obsidian for this to work. Since it internally uses the Daily Note plugin to create the note for you, templates will work the same way as if it was triggered from within Obsidian.
+ * `:ObsidianBridgeDailyNote` takes you to your daily note or generates it for you if it doesn't already exist. Make sure to have the Daily Notes core plugin enabled in Obsidian for this to work. Since it internally uses the Daily Note plugin to create the note for you, templates will work the same way as if it was triggered from within Obsidian.
 
 ### :scroll: Sync of buffer scrolling
 
@@ -107,7 +107,7 @@ Now that you've built your own version of the plugin, uninstall the original plu
 
 Remember to enable the server type needed in the plugin settings inside Obsidian.
 
-The final thing to do is to set `scroll_sync = true` in your obsidian-sync configuration.
+The final thing to do is to set `scroll_sync = true` in your obsidian-bridge configuration.
 
 Now scrolling a note in neovim should also result in scrolling in Obsidian. Note however that this only works if the note is in <b>editing mode</b> in Obsidian. Any suggestions on how to make it work also in view mode would be very appreciated. :)
 

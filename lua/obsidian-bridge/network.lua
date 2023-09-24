@@ -1,6 +1,6 @@
 local M = {}
-local config = require("obsidian-sync.config")
-local uri = require("obsidian-sync.uri")
+local config = require("obsidian-bridge.config")
+local uri = require("obsidian-bridge.uri")
 
 M.make_api_call = function(request)
 	local handle = io.popen(request)

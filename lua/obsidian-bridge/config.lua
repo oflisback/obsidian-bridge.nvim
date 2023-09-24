@@ -17,7 +17,7 @@ M.get_api_key = function()
 		vim.api.nvim_out_write(
 			"Please set the "
 				.. M.api_key_env_var_name
-				.. " environment variable to use the obsidian-sync.nvim plugin.\n"
+				.. " environment variable to use the obsidian-bridge.nvim plugin.\n"
 		)
 	end
 	return api_key
