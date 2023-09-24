@@ -1,4 +1,4 @@
-### Purpose
+### :lotus_position: Purpose
 
 [Obsidian](https://obsidian.md/) is great, but it doesn't offer the first-class Neovim experience that some of us just can't seem to do without. [obsidian.nvim](https://github.com/epwalsh/obsidian.nvim) does a good job of letting us enjoy the best of both worlds by enabling users to navigate the obsidian vault inside Neovim. The main motivation for that plugin was to improve the neovim experience with Obsidian vaults, while still viewing the rendered notes in the Obsidian app.
 
@@ -6,11 +6,11 @@ This plugin takes that concept one step further by mirroring navigation events i
 
 This is accomplished by leveraging the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) plugin for Obsidian.
 
-### Demo
+### :movie_camera: Demo
 
 ![demo](assets/obsidian-sync.gif?raw=true)
 
-### Installation
+### :mechanic: Installation
 
 1. Make sure you have [curl](https://curl.se/) installed on your system and available on your `PATH`.
 
@@ -59,7 +59,7 @@ Plug 'oflisback/obsidian-sync.nvim'
 
 </details>
 
-### Configuration
+### :gear: Configuration
 
 If no config parameter is provided to the setup function this default configuration will be used:
 
@@ -82,7 +82,11 @@ Pass a config table as parameter to the setup function to provide an alternative
 }
 ```
 
-### Sync of buffer scrolling
+### :keyboard: Commands
+
+ * `:ObsidianSyncDailyNote` takes you to your daily note or generates it for you if it doesn't already exist. Make sure to have the Daily Notes core plugin enabled in Obsidian for this to work. Since it internally uses the Daily Note plugin to create the note for you, templates will work the same way as if it was triggered from within Obsidian.
+
+### :scroll: Sync of buffer scrolling
 
 Ideally scrolling within a note in neovim should also make the scroll position be centered in Obsidian. This is possible, but requires a patched version of [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) so we'll have to build it ourselves. For more info about the patch's status see this [discussion](https://github.com/coddingtonbear/obsidian-local-rest-api/discussions/75).
 
@@ -107,12 +111,16 @@ The final thing to do is to set `scroll_sync = true` in your obsidian-sync confi
 
 Now scrolling a note in neovim should also result in scrolling in Obsidian. Note however that this only works if the note is in <b>editing mode</b> in Obsidian. Any suggestions on how to make it work also in view mode would be very appreciated. :)
 
-### Contributing
+### :books: Other projects for Neovim + Obsidian
+
+* [obsidian.nvim](https://github.com/epwalsh/obsidian.nvim) Takes the approach to interact with Obsidian vaults directly via the filesystem. :brain:
+
+### :people_holding_hands: Contributing
 
 Contributions, bug reports and suggestions are very welcome.
 
 If you have a suggestion that would make the project better, please fork the repo and create a pull request.
 
-### Future
+### :crystal_ball: Future
 
-- [ ] Detect if a file is located inside an Obsidian vault or not.
+- [ ] Detect if a file is located inside an Obsidian vault or not and cache known obsidian directories. This lets us ignore markdown files outside of vaults.

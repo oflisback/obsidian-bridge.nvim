@@ -56,6 +56,15 @@ end
 function M.setup(user_config)
 	configuration = config.get_final_config(user_config)
 
+	function ObsidianSyncDailyNote()
+		local api_key = config.get_api_key()
+		if api_key ~= nil then
+			network.daily_note(configuration, api_key)
+		end
+	end
+	-- Register the command
+	vim.cmd("command! ObsidianSyncDailyNote lua ObsidianSyncDailyNote()")
+
 	api.nvim_create_autocmd("BufEnter", {
 		callback = on_buf_enter,
 		pattern = "*",
