@@ -1,8 +1,8 @@
 ### :lotus_position: Purpose
 
-[Obsidian](https://obsidian.md/) is great, but it doesn't offer the first-class Neovim experience that some of us just can't seem to do without. [obsidian.nvim](https://github.com/epwalsh/obsidian.nvim) does a good job of letting us enjoy the best of both worlds by enabling users to navigate the obsidian vault inside Neovim. The main motivation for that plugin was to improve the neovim experience with Obsidian vaults, while still viewing the rendered notes in the Obsidian app.
+[Obsidian](https://obsidian.md/) is great, but it doesn't offer the first-class Neovim experience that some of us just can't seem to do without. In the scenario where we edit notes in Neovim and view them rendered in Obsidian we would also like Obsidian to automatically follow navigation we do on the Neovim side.
 
-This plugin takes that concept one step further by mirroring navigation events in Neovim in the Obsidian app. If you open a note in Neovim the Obsidian App will show the same note automatically. If you navigate to another one or navigates to another Neovim buffer, the Obsidian app will show the corresponding note.
+That's where obsidian-bridge.nvim comes in. It mirrors navigation events in Neovim in the Obsidian app. If you open a note in Neovim the Obsidian App will show the same note automatically. If you navigate to another one or navigates to another Neovim buffer, the Obsidian app will show the corresponding note.
 
 This is accomplished by leveraging the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) plugin for Obsidian.
 
@@ -107,7 +107,7 @@ Now scrolling a note in neovim should also result in scrolling in Obsidian. Note
 
 ### :books: Other projects for Neovim + Obsidian
 
-* [obsidian.nvim](https://github.com/epwalsh/obsidian.nvim) Takes the approach to interact with Obsidian vaults directly via the filesystem. :brain:
+* [obsidian.nvim](https://github.com/epwalsh/obsidian.nvim) Lets us interact with Obsidian vaults directly via the filesystem. :brain:
 
 ### :people_holding_hands: Contributing
 
