@@ -85,6 +85,9 @@ Pass a config table as parameter to the setup function to provide an alternative
 ### :keyboard: Commands
 
  * `:ObsidianBridgeDailyNote` takes you to your daily note or generates it for you if it doesn't already exist. Make sure to have the Daily Notes core plugin enabled in Obsidian for this to work. Since it internally uses the Daily Note plugin to create the note for you, templates will work the same way as if it was triggered from within Obsidian.
+ * `:ObsidianBridgeOpenGraph` opens the graph view in Obsidian, as long as the Graph core plugin is enabled.
+
+:bulb: Feel free to suggest additional useful commands via issue or PR.
 
 ### :scroll: Sync of buffer scrolling
 

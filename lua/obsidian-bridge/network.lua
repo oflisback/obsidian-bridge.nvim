@@ -42,9 +42,9 @@ M.scroll_into_view = function(line, final_config, api_key)
 	M.make_api_call(request)
 end
 
-M.daily_note = function(final_config, api_key)
+M.execute_command = function(final_config, api_key, command)
 	local server_address = final_config.obsidian_server_address
-	local url = uri.EncodeURI(server_address .. "/commands/daily-notes")
+	local url = uri.EncodeURI(server_address .. "/commands/" .. command)
 	local authToken = "Bearer " .. api_key
 	M.make_api_call(
 		'curl -s -X POST -H "Content-Type: application/json" -H "Authorization: ' .. authToken .. '" ' .. url

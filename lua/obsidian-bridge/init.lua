@@ -59,11 +59,21 @@ function M.setup(user_config)
 	function ObsidianBridgeDailyNote()
 		local api_key = config.get_api_key()
 		if api_key ~= nil then
-			network.daily_note(configuration, api_key)
+			network.execute_command(configuration, api_key, "daily-notes")
+			-- would be neat if it also opened daily note
 		end
 	end
 	-- Register the command
 	vim.cmd("command! ObsidianBridgeDailyNote lua ObsidianBridgeDailyNote()")
+
+	function ObsidianBridgeOpenGraph()
+		local api_key = config.get_api_key()
+		if api_key ~= nil then
+			network.execute_command(configuration, api_key, "graph:open")
+		end
+	end
+	-- Register the command
+	vim.cmd("command! ObsidianBridgeOpenGraph lua ObsidianBridgeOpenGraph()")
 
 	api.nvim_create_autocmd("BufEnter", {
 		callback = on_buf_enter,
