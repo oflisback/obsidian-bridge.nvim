@@ -95,13 +95,17 @@ Ideally scrolling within a note in neovim should also make the scroll position b
 
 Specifically what's required is a build based on [this fork](https://github.com/coddingtonbear/obsidian-local-rest-api/compare/main...oflisback:obsidian-local-rest-api:main) which hopefully can get integrated in the upstream project eventually.
 
-Start off by cloning the [patched fork](https://github.com/oflisback/obsidian-local-rest-api). An important gotcha is that Local REST API has a dependency on "master" for "obsidian". But "master" has been updated since that dependency was pinned to a certain checksum in package-lock.json. The quick fix is to `rm package-lock.json` and then `npm install` again.
+Start off by cloning the [patched fork](https://github.com/oflisback/obsidian-local-rest-api) to a folder named obsidian-local-rest-api-with-scroll: 
 
-After that the plugin can be built with `npm run build`.
+```
+git clone https://github.com/oflisback/obsidian-local-rest-api obsidian-local-rest-api-with-scroll
+```
 
-Now that you've built your own version of the plugin, place the obsidian-local-rest-api in your vault-dir's `.obsidian/plugins/` folder and enable the "Local REST API with Scroll" plugin.
+Then do `npm install` followed by `npm run build` inside that folder.
 
-The final thing to do is to set `scroll_sync = true` in your obsidian-bridge configuration.
+Now that you've built your own version of the plugin, place the obsidian-local-rest-api-with-scroll in your vault's `.obsidian/plugins/` folder and enable the "Local REST API with Scroll" plugin in the Obsidian settings panel.
+
+The final thing to do is to set `scroll_sync = true` in your obsidian-bridge.nvim configuration and update the `OBSIDIAN_REST_API_KEY` value to what was generated for the new version of the plugin.
 
 Now scrolling a note in neovim should also result in scrolling in Obsidian. Note however that this only works if the note is in <b>editing mode</b> in Obsidian. Any suggestions on how to make it work also in view mode would be very appreciated. :)
 
