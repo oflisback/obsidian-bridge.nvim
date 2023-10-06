@@ -114,7 +114,3 @@ Now scrolling a note in neovim should also result in scrolling in Obsidian. Note
 Contributions, bug reports and suggestions are very welcome.
 
 If you have a suggestion that would make the project better, please fork the repo and create a pull request.
-
-### :crystal_ball: Future
-
-- [ ] Detect if a file is located inside an Obsidian vault or not and cache known obsidian directories. This lets us ignore markdown files outside of vaults.
