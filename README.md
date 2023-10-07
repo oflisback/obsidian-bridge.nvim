@@ -86,6 +86,7 @@ Pass a config table as parameter to the setup function to provide an alternative
 
  * `:ObsidianBridgeDailyNote` takes you to your daily note or generates it for you if it doesn't already exist. Make sure to have the Daily Notes core plugin enabled in Obsidian for this to work. Since it internally uses the Daily Note plugin to create the note for you, templates will work the same way as if it was triggered from within Obsidian.
  * `:ObsidianBridgeOpenGraph` opens the graph view in Obsidian, as long as the Graph core plugin is enabled.
+ * `:ObsidianBridgeOpenVaultMenu` opens the Obsidian vault selection dialog. Obsidian does not expose a way to switch to another vault programmatically (yet?).
 
 :bulb: Feel free to suggest additional useful commands via issue or PR.
 
@@ -107,7 +108,7 @@ Now that you've built your own version of the plugin, place the obsidian-local-r
 
 The final thing to do is to set `scroll_sync = true` in your obsidian-bridge.nvim configuration and update the `OBSIDIAN_REST_API_KEY` value to what was generated for the new version of the plugin.
 
-Now scrolling a note in neovim should also result in scrolling in Obsidian. Note however that this only works if the note is in <b>editing mode</b> in Obsidian. Any suggestions on how to make it work also in view mode would be very appreciated. :)
+Now scrolling a note in neovim should also result in scrolling in Obsidian. Note however that this only works if the note is in <b>editing mode</b> in Obsidian. Any suggestions on how to make it work also in view mode would be very appreciated, until then make sure that notes are opened in editing mode by default via the Obsidian setting Editor -> Default view for new tabs -> Editing view.
 
 ### :books: Other projects for Neovim + Obsidian
 

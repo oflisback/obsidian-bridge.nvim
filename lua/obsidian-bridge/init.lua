@@ -1,4 +1,5 @@
 local api = vim.api
+local commands = require("obsidian-bridge.commands")
 local config = require("obsidian-bridge.config")
 local network = require("obsidian-bridge.network")
 
@@ -73,25 +74,11 @@ end
 
 function M.setup(user_config)
 	configuration = config.get_final_config(user_config)
+	local api_key = config.get_api_key()
 
-	function ObsidianBridgeDailyNote()
-		local api_key = config.get_api_key()
-		if api_key ~= nil then
-			network.execute_command(configuration, api_key, "daily-notes")
-			-- would be neat if it also opened daily note
-		end
+	if api_key ~= nil then
+		commands.register(configuration, api_key)
 	end
-	-- Register the command
-	vim.cmd("command! ObsidianBridgeDailyNote lua ObsidianBridgeDailyNote()")
-
-	function ObsidianBridgeOpenGraph()
-		local api_key = config.get_api_key()
-		if api_key ~= nil then
-			network.execute_command(configuration, api_key, "graph:open")
-		end
-	end
-	-- Register the command
-	vim.cmd("command! ObsidianBridgeOpenGraph lua ObsidianBridgeOpenGraph()")
 
 	api.nvim_create_autocmd("BufEnter", {
 		callback = on_buf_enter,
