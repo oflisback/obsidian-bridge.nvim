@@ -1,6 +1,7 @@
 local api = vim.api
 local config = require("obsidian-bridge.config")
 local network = require("obsidian-bridge.network")
+local obsidianUtil = require("obsidian.util")
 
 local M = {}
 
@@ -53,6 +54,16 @@ local function on_cursor_moved()
 	end
 end
 
+function M.open_note(vault_dir, note_name)
+	local notes = obsidianUtil.find_note(vault_dir, note_name)
+	if #notes > 0 then
+		local path = notes[1]
+		vim.api.nvim_command("e " .. tostring(path))
+		return true
+	end
+	return false
+end
+
 function M.setup(user_config)
 	configuration = config.get_final_config(user_config)
 
@@ -60,9 +71,20 @@ function M.setup(user_config)
 		local api_key = config.get_api_key()
 		if api_key ~= nil then
 			network.execute_command(configuration, api_key, "daily-notes")
-			-- would be neat if it also opened daily note
+			-- Assuming daily note format: YYYY-MM-DD
+			-- If obsidian.nvim is available, open the daily note. Check at runtime.
+			if obsidianUtil ~= nil then
+				local note_name = os.date("%Y-%m-%d") .. ".md"
+				-- See if we can use
+				local success = M.open_note(configuration.vault_dir, note_name)
+				if not success then
+					-- didn't find the new note, wait for x ms and try again
+					M.open_note(configuration.vault_dir, note_name)
+				end
+			end
 		end
 	end
+
 	-- Register the command
 	vim.cmd("command! ObsidianBridgeDailyNote lua ObsidianBridgeDailyNote()")
 

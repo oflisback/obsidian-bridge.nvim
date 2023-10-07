@@ -6,6 +6,7 @@ M.get_final_config = function(user_config)
 	local default_config = {
 		obsidian_server_address = "http://localhost:27123",
 		scroll_sync = false,
+		vault_dir = nil,
 	}
 	return vim.tbl_extend("keep", user_config or {}, default_config)
 end
