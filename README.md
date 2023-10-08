@@ -37,6 +37,9 @@ export OBSIDIAN_REST_API_KEY=<your api key, without the brackets>
     "BufNewFile *.md",
   },
   lazy = true,
+  dependencies = {
+    "nvim-lua/plenary.nvim",
+  }
 }
 ```
 
@@ -51,6 +54,9 @@ require('packer').startup(function()
       'oflisback/obsidian-bridge.nvim',
       requires = { "nvim-telescope/telescope.nvim" }
       config = function() require('obsidian-bridge').setup() end
+      requires = {
+        "nvim-lua/plenary.nvim",
+      },
     }
 end)
 ```
@@ -62,6 +68,7 @@ end)
 ```vim
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'oflisback/obsidian-bridge.nvim'
+  Plug 'nvim-lua/plenary.nvim'
 ```
 
 </details>
