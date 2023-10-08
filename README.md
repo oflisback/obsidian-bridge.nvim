@@ -31,7 +31,10 @@ export OBSIDIAN_REST_API_KEY=<your api key, without the brackets>
 {
   "oflisback/obsidian-bridge.nvim",
   config = function() require("obsidian-bridge").setup() end,
-  lazy = false
+  lazy = false,
+  dependencies = {
+    "nvim-lua/plenary.nvim",
+  }
 }
 ```
 
@@ -45,6 +48,9 @@ require('packer').startup(function()
     use {
       'oflisback/obsidian-bridge.nvim',
       config = function() require('obsidian-bridge').setup() end
+      requires = {
+        "nvim-lua/plenary.nvim",
+      },
     }
 end)
 ```
@@ -55,6 +61,7 @@ end)
 
 ```vim
 Plug 'oflisback/obsidian-bridge.nvim'
+  Plug 'nvim-lua/plenary.nvim'
 ```
 
 </details>
