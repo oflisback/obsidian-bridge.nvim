@@ -31,7 +31,11 @@ export OBSIDIAN_REST_API_KEY=<your api key, without the brackets>
 {
   "oflisback/obsidian-bridge.nvim",
   config = function() require("obsidian-bridge").setup() end,
-  lazy = false
+  event = {
+    "BufReadPre *.md",
+    "BufNewFile *.md",
+  },
+  lazy = true,
 }
 ```
 
@@ -78,7 +82,11 @@ Pass a config table as parameter to the setup function to provide an alternative
   config = function() require("obsidian-bridge").setup({
     obsidian_server_address = "https://localhost:27124"
   }) end,
-  lazy = false
+  event = {
+    "BufReadPre *.md",
+    "BufNewFile *.md",
+  },
+  lazy = true
 }
 ```
 
