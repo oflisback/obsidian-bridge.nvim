@@ -1,5 +1,6 @@
 local M = {}
 local config = require("obsidian-bridge.config")
+local curl = require("plenary.curl")
 local uri = require("obsidian-bridge.uri")
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
@@ -7,60 +8,54 @@ local telescope_conf = require("telescope.config").values
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 
-M.make_api_call = function(request)
-	local handle = io.popen(request)
-	if handle ~= nil then
-		local result = handle:read("*a")
-		handle:close()
-		if result ~= nil and result ~= "" then
-			local decoded = vim.json.decode(result)
+local make_api_call = function(final_config, api_key, path, json_body)
+	local url = final_config.obsidian_server_address .. path
+	local body = json_body and vim.fn.json_encode(json_body) or nil
+
+	curl.post(url, {
+		body = body,
+		callback = function(res)
+			vim.schedule(function()
+				if res.body and res.body ~= "" then
+					local decoded = vim.fn.json_decode(res.body)
+					if decoded and decoded.errorCode == 40101 then
+						vim.api.nvim_err_writeln(
+							"Error: authentication error, please check your "
+								.. config.api_key_env_var_name
+								.. " value."
+						)
+					end
+				end
+			end)
+		end,
+		on_error = function(res)
 			-- Ignore other errors for now, for instance if we can't contact obsidian server it's
 			-- not running, that's often times probably intentional.
-			if decoded.errorCode == 40101 then
-				vim.api.nvim_err_writeln(
-					"Error: authentication error, please check your " .. config.api_key_env_var_name .. " value."
-				)
-			else
-				return decoded
-			end
-		end
-	end
+			print(res.message)
+		end,
+		headers = {
+			content_type = "application/json",
+			Authorization = "Bearer " .. api_key,
+		},
+	})
 end
 
 M.scroll_into_view = function(line, final_config, api_key)
-	local server_address = final_config.obsidian_server_address
-	local url = server_address .. "/editor/scroll-into-view"
-	local authToken = "Bearer " .. api_key
+	local json_body = {
+		center = true,
+		range = {
+			from = { ch = 0, line = line },
+			to = { ch = 0, line = line },
+		},
+	}
 
-	local data = '--data \'{ "center": '
-		.. "true"
-		.. ', "range": { "from": { "ch": 0, "line": '
-		.. line
-		.. ' }, "to": { "ch": 0, "line": '
-		.. line
-		.. " }}}' "
-
-	local request = 'curl -s -X POST -H "Content-Type: application/json" -H "Authorization: '
-		.. authToken
-		.. '" '
-		.. data
-		.. url
-
-	M.make_api_call(request)
+	local path = uri.EncodeURI("/editor/scroll-into-view")
+	make_api_call(final_config, api_key, path, json_body)
 end
 
-M.execute_command = function(final_config, api_key, method, command)
-	local server_address = final_config.obsidian_server_address
-	local url = uri.EncodeURI(server_address .. "/commands/" .. command)
-	local authToken = "Bearer " .. api_key
-	return M.make_api_call(
-		"curl -s -X "
-			.. method
-			.. ' -H "Content-Type: application/json" -H "Authorization: '
-			.. authToken
-			.. '" '
-			.. url
-	)
+M.execute_command = function(final_config, api_key, command)
+	local path = uri.EncodeURI("/commands/" .. command)
+	make_api_call(final_config, api_key, path)
 end
 
 M.telescope_command = function(final_config, api_key)
@@ -101,12 +96,8 @@ M.telescope_command = function(final_config, api_key)
 end
 
 M.open_in_obsidian = function(filename, final_config, api_key)
-	local server_address = final_config.obsidian_server_address
-	local url = uri.EncodeURI(server_address .. "/open/" .. filename)
-	local authToken = "Bearer " .. api_key
-	M.make_api_call(
-		'curl -s -X POST -H "Content-Type: application/json" -H "Authorization: ' .. authToken .. '" ' .. url
-	)
+	local path = uri.EncodeURI("/open/" .. filename)
+	make_api_call(final_config, api_key, path)
 end
 
 return M
