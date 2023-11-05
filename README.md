@@ -30,6 +30,7 @@ export OBSIDIAN_REST_API_KEY=<your api key, without the brackets>
 ```lua
 {
   "oflisback/obsidian-bridge.nvim",
+  dependencies = {"nvim-telescope/telescope.nvim"},
   config = function() require("obsidian-bridge").setup() end,
   event = {
     "BufReadPre *.md",
@@ -48,6 +49,7 @@ export OBSIDIAN_REST_API_KEY=<your api key, without the brackets>
 require('packer').startup(function()
     use {
       'oflisback/obsidian-bridge.nvim',
+      requires = { "nvim-telescope/telescope.nvim" }
       config = function() require('obsidian-bridge').setup() end
     }
 end)
@@ -58,6 +60,7 @@ end)
   <summary>vim-plug</summary>
 
 ```vim
+Plug 'nvim-telescope/telescope.nvim'
 Plug 'oflisback/obsidian-bridge.nvim'
 ```
 
@@ -95,6 +98,7 @@ Pass a config table as parameter to the setup function to provide an alternative
  * `:ObsidianBridgeDailyNote` takes you to your daily note or generates it for you if it doesn't already exist. Make sure to have the Daily Notes core plugin enabled in Obsidian for this to work. Since it internally uses the Daily Note plugin to create the note for you, templates will work the same way as if it was triggered from within Obsidian.
  * `:ObsidianBridgeOpenGraph` opens the graph view in Obsidian, as long as the Graph core plugin is enabled.
  * `:ObsidianBridgeOpenVaultMenu` opens the Obsidian vault selection dialog. Obsidian does not expose a way to switch to another vault programmatically (yet?).
+ * `:ObsidianBridgeTelescopeCommand` lists all the executable commands in Telescope. Execute the selected one.
 
 :bulb: Feel free to suggest additional useful commands via issue or PR.
 
