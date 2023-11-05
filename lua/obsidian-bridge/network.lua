@@ -81,7 +81,7 @@ M.telescope_command = function(final_config, api_key)
     local obsidian_commands = function(opts)
         opts = opts or {}
         pickers.new(opts, {
-            prompt_title = "colors",
+            prompt_title = "Obsidian Commands",
             finder = finders.new_table {
                 results = command_names
             },
