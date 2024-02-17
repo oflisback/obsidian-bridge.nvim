@@ -14,7 +14,7 @@ This is accomplished by leveraging the [Local REST API](https://github.com/coddi
 
 1. Make sure you have [curl](https://curl.se/) installed on your system and available on your `PATH`.
 
-2. Install and enable the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) community plugin in Obsidian. The default configuration of obsidian-bridge.nvim will try to connect to the non-encrypted server variant so remember to enable that in the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) settings if you want to use it.
+2. Install and enable the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) community plugin in Obsidian. <span style="color: red;">Important:</span> The default configuration of obsidian-bridge.nvim will try to connect to the non-encrypted server variant so remember to enable that in the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) settings if you want to use it.
 
 3. Set the environment variable `OBSIDIAN_REST_API_KEY` to the API key found in the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) settings within Obsidian, for example:
 
@@ -107,6 +107,10 @@ Pass a config table as parameter to the setup function to provide an alternative
 
 Ideally scrolling within a note in neovim should also make the scroll position be centered in Obsidian. This is possible, but requires a patched version of [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) so we'll have to build it ourselves. For more info about the patch's status see this [discussion](https://github.com/coddingtonbear/obsidian-local-rest-api/discussions/75).
 
+#### Two ways of doing this, either build the fork or patch your local version
+
+##### A) Build a forked version of obsidian-local-rest-api
+
 Specifically what's required is a build based on [this fork](https://github.com/coddingtonbear/obsidian-local-rest-api/compare/main...oflisback:obsidian-local-rest-api:main) which hopefully can get integrated in the upstream project eventually.
 
 Start off by cloning the [patched fork](https://github.com/oflisback/obsidian-local-rest-api) to a folder named obsidian-local-rest-api-with-scroll: 
@@ -118,6 +122,12 @@ git clone https://github.com/oflisback/obsidian-local-rest-api obsidian-local-re
 Then do `npm install` followed by `npm run build` inside that folder.
 
 Now that you've built your own version of the plugin, place the obsidian-local-rest-api-with-scroll in your vault's `.obsidian/plugins/` folder and enable the "Local REST API with Scroll" plugin in the Obsidian settings panel.
+
+##### B) Patch your version of obsidian-local-rest-api
+
+See [this issue](https://github.com/oflisback/obsidian-bridge.nvim/issues/7) for a convenient script to accomplish this.
+
+#### After either completing (A) or (B)
 
 The final thing to do is to set `scroll_sync = true` in your obsidian-bridge.nvim configuration and update the `OBSIDIAN_REST_API_KEY` value to what was generated for the new version of the plugin.
 
