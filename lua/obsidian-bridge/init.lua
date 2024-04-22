@@ -26,6 +26,9 @@ end
 local function get_active_buffer_obsidian_markdown_filename()
 	local bufnr = vim.api.nvim_get_current_buf()
 	local filename_incl_path = vim.api.nvim_buf_get_name(bufnr)
+	if vim.fn.has("win32") then
+		filename_incl_path = string.gsub(filename_incl_path, "\\", "/")
+	end
 	if filename_incl_path == nil or string.sub(filename_incl_path, -3) ~= ".md" then
 		return nil
 	end
