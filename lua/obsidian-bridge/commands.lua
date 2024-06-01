@@ -4,7 +4,7 @@ local M = {}
 
 M.register = function(configuration, api_key)
 	function ObsidianBridgeDailyNote()
-		network.execute_command(configuration, api_key, "daily-notes")
+		network.execute_command(configuration, api_key, "POST", "daily-notes")
 		-- would be neat if it also opened daily note
 	end
 	vim.cmd("command! ObsidianBridgeDailyNote lua ObsidianBridgeDailyNote()")
@@ -14,12 +14,12 @@ M.register = function(configuration, api_key)
 	vim.cmd("command! ObsidianBridgeTelescopeCommand lua ObsidianBridgeTelescopeCommand()")
 
 	function ObsidianBridgeOpenGraph()
-		network.execute_command(configuration, api_key, "graph:open")
+		network.execute_command(configuration, api_key, "POST", "graph:open")
 	end
 	vim.cmd("command! ObsidianBridgeOpenGraph lua ObsidianBridgeOpenGraph()")
 
 	function ObsidianBridgeOpenVaultMenu()
-		network.execute_command(configuration, api_key, "app:open-vault")
+		network.execute_command(configuration, api_key, "POST", "app:open-vault")
 	end
 	vim.cmd("command! ObsidianBridgeOpenVaultMenu lua ObsidianBridgeOpenVaultMenu()")
 end
