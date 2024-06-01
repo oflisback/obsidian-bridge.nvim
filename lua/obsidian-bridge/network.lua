@@ -59,7 +59,7 @@ M.execute_command = function(final_config, api_key, command)
 end
 
 M.telescope_command = function(final_config, api_key)
-	local commands = M.execute_command(final_config, api_key, "GET", "")
+	local commands = M.execute_command(final_config, api_key, "")
 	if commands == nil or commands.commands == nil then
 		vim.notify("Get commands list failed")
 		return
@@ -81,11 +81,11 @@ M.telescope_command = function(final_config, api_key)
 					results = command_names,
 				}),
 				sorter = telescope_conf.generic_sorter(opts),
-				attach_mappings = function(prompt_bufnr, map)
+				attach_mappings = function(prompt_bufnr, _)
 					actions.select_default:replace(function()
 						actions.close(prompt_bufnr)
 						local selection = action_state.get_selected_entry()
-						M.execute_command(final_config, api_key, "POST", command_name_id_map[selection[1]])
+						M.execute_command(final_config, api_key, command_name_id_map[selection[1]])
 					end)
 					return true
 				end,
