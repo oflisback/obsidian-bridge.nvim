@@ -116,7 +116,15 @@ Ideally scrolling within a note in neovim should also make the scroll position b
 
 #### Two ways of doing this, either build the fork or patch your local version
 
-##### A) Build a forked version of obsidian-local-rest-api
+##### A) Use BRAT to install my forked version of obsidian-local-rest-api
+
+1. Install the Obsidian [BRAT](https://github.com/TfTHacker/obsidian42-brat) plugin.
+
+2. In the settings for BRAT, select "Add beta plugin with frozen version".
+
+3. Add `https://github.com/oflisback/obsidian-local-rest-api` with release version tag `v1.0.0`. The added plugin is called "Local REST API with scroll".
+
+##### B) Build a forked version of obsidian-local-rest-api
 
 Specifically what's required is a build based on [this fork](https://github.com/coddingtonbear/obsidian-local-rest-api/compare/main...oflisback:obsidian-local-rest-api:main) which hopefully can get integrated in the upstream project eventually.
 
@@ -129,10 +137,6 @@ git clone https://github.com/oflisback/obsidian-local-rest-api obsidian-local-re
 Then do `npm install` followed by `npm run build` inside that folder.
 
 Now that you've built your own version of the plugin, place the obsidian-local-rest-api-with-scroll in your vault's `.obsidian/plugins/` folder and enable the "Local REST API with Scroll" plugin in the Obsidian settings panel.
-
-##### B) Patch your version of obsidian-local-rest-api
-
-See [this issue](https://github.com/oflisback/obsidian-bridge.nvim/issues/7) for a convenient script to accomplish this.
 
 #### After either completing (A) or (B)
 
