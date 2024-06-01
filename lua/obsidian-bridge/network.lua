@@ -11,13 +11,13 @@ local action_state = require("telescope.actions.state")
 -- Makes an API call to the local REST plugin
 -- @param final_config
 -- @param api_key
+-- @param request_method valid value for plenary's curl.request method, "GET", "POST", etc
 -- @param path
 -- @param json_body
--- @param request_method valid value for plenary's curl.request method, "get", "post", etc
-local make_api_call = function(final_config, api_key, path, json_body, request_method)
+local make_api_call = function(final_config, api_key, request_method, path, json_body)
 	local url = final_config.obsidian_server_address .. path
 	local body = json_body and vim.fn.json_encode(json_body) or nil
-	local method = request_method or "post"
+	local method = string.lower(request_method) or "post"
 
 	local result = curl.request({
 		url = url,
@@ -58,16 +58,16 @@ M.scroll_into_view = function(line, final_config, api_key)
 	}
 
 	local path = uri.EncodeURI("/editor/scroll-into-view")
-	return make_api_call(final_config, api_key, path, json_body)
+	return make_api_call(final_config, api_key, "POST", path, json_body)
 end
 
-M.execute_command = function(final_config, api_key, command, request_method)
+M.execute_command = function(final_config, api_key, request_method, command)
 	local path = uri.EncodeURI("/commands/" .. command)
-	return make_api_call(final_config, api_key, path, nil, request_method)
+	return make_api_call(final_config, api_key, request_method, path)
 end
 
 M.telescope_command = function(final_config, api_key)
-	local commands = M.execute_command(final_config, api_key, "", "get")
+	local commands = M.execute_command(final_config, api_key, "GET", "")
 	if commands == nil or commands.commands == nil then
 		vim.notify("Get commands list failed")
 		return
@@ -93,7 +93,7 @@ M.telescope_command = function(final_config, api_key)
 					actions.select_default:replace(function()
 						actions.close(prompt_bufnr)
 						local selection = action_state.get_selected_entry()
-						M.execute_command(final_config, api_key, command_name_id_map[selection[1]])
+						M.execute_command(final_config, api_key, "POST", command_name_id_map[selection[1]])
 					end)
 					return true
 				end,
@@ -105,7 +105,7 @@ end
 
 M.open_in_obsidian = function(filename, final_config, api_key)
 	local path = uri.EncodeURI("/open/" .. filename)
-	make_api_call(final_config, api_key, path)
+	make_api_call(final_config, api_key, "POST", path)
 end
 
 return M
