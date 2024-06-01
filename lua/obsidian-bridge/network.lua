@@ -8,26 +8,21 @@ local telescope_conf = require("telescope.config").values
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 
-local make_api_call = function(final_config, api_key, path, json_body)
+-- Makes an API call to the local REST plugin
+-- @param final_config
+-- @param api_key
+-- @param path
+-- @param json_body
+-- @param request_method valid value for plenary's curl.request method, "get", "post", etc
+local make_api_call = function(final_config, api_key, path, json_body, request_method)
 	local url = final_config.obsidian_server_address .. path
 	local body = json_body and vim.fn.json_encode(json_body) or nil
+	local method = request_method or "post"
 
-	curl.post(url, {
+	local result = curl.request({
+		url = url,
+		method = method,
 		body = body,
-		callback = function(res)
-			vim.schedule(function()
-				if res.body and res.body ~= "" then
-					local decoded = vim.fn.json_decode(res.body)
-					if decoded and decoded.errorCode == 40101 then
-						vim.api.nvim_err_writeln(
-							"Error: authentication error, please check your "
-								.. config.api_key_env_var_name
-								.. " value."
-						)
-					end
-				end
-			end)
-		end,
 		on_error = function(res)
 			-- Ignore other errors for now, for instance if we can't contact obsidian server it's
 			-- not running, that's often times probably intentional.
@@ -38,6 +33,19 @@ local make_api_call = function(final_config, api_key, path, json_body)
 			Authorization = "Bearer " .. api_key,
 		},
 	})
+
+	if result.body and result.body ~= "" then
+		local decoded = vim.fn.json_decode(result.body)
+		if decoded and decoded.errorCode == 40101 then
+			vim.api.nvim_err_writeln(
+				"Error: authentication error, please check your "
+					.. config.api_key_env_var_name
+					.. " value."
+			)
+		else
+			return decoded
+		end
+	end
 end
 
 M.scroll_into_view = function(line, final_config, api_key)
@@ -50,16 +58,16 @@ M.scroll_into_view = function(line, final_config, api_key)
 	}
 
 	local path = uri.EncodeURI("/editor/scroll-into-view")
-	make_api_call(final_config, api_key, path, json_body)
+	return make_api_call(final_config, api_key, path, json_body)
 end
 
-M.execute_command = function(final_config, api_key, command)
+M.execute_command = function(final_config, api_key, command, request_method)
 	local path = uri.EncodeURI("/commands/" .. command)
-	make_api_call(final_config, api_key, path)
+	return make_api_call(final_config, api_key, path, nil, request_method)
 end
 
 M.telescope_command = function(final_config, api_key)
-	local commands = M.execute_command(final_config, api_key, "")
+	local commands = M.execute_command(final_config, api_key, "", "get")
 	if commands == nil or commands.commands == nil then
 		vim.notify("Get commands list failed")
 		return
