@@ -11,12 +11,13 @@ api.nvim_create_augroup("obsidian-bridge.nvim", {
 	clear = true,
 })
 
-local function is_obsidian_vault(path)
+local function get_vault_name(path)
 	local current_path = vim.fn.expand(path)
 	while current_path ~= "/" do
 		local obsidian_folder = current_path .. "/.obsidian"
 		if vim.fn.isdirectory(obsidian_folder) == 1 then
-			return true
+			local vault_name = obsidian_folder:match("/([^/]+)/%.obsidian$")
+			return vault_name:gsub("([^%w])", "%%%1")
 		end
 		current_path = vim.fn.fnamemodify(current_path, ":h")
 	end
@@ -35,11 +36,12 @@ local function get_active_buffer_obsidian_markdown_filename()
 	end
 
 	local path = vim.fn.fnamemodify(filename_incl_path, ":p:h")
-	if not is_obsidian_vault(path) then
+	local vault_name = get_vault_name(path)
+	if not vault_name then
 		return nil
 	end
 
-	return string.match(filename_incl_path, ".+/(.+)$")
+	return filename_incl_path:match(".*/" .. vault_name .. "/(.*)")
 end
 
 local function on_buf_enter()
