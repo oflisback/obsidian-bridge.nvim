@@ -60,6 +60,7 @@ require('packer').startup(function()
     }
 end)
 ```
+
 </details>
 
 <details>
@@ -103,10 +104,10 @@ Pass a config table as parameter to the setup function to provide an alternative
 
 ### :keyboard: Commands
 
- * `:ObsidianBridgeDailyNote` takes you to your daily note or generates it for you if it doesn't already exist. Make sure to have the Daily Notes core plugin enabled in Obsidian for this to work. Since it internally uses the Daily Note plugin to create the note for you, templates will work the same way as if it was triggered from within Obsidian.
- * `:ObsidianBridgeOpenGraph` opens the graph view in Obsidian, as long as the Graph core plugin is enabled.
- * `:ObsidianBridgeOpenVaultMenu` opens the Obsidian vault selection dialog. Obsidian does not expose a way to switch to another vault programmatically (yet?).
- * `:ObsidianBridgeTelescopeCommand` lists all the executable commands in Telescope. Execute the selected one.
+- `:ObsidianBridgeDailyNote` takes you to your daily note or generates it for you if it doesn't already exist. Make sure to have the Daily Notes core plugin enabled in Obsidian for this to work. Since it internally uses the Daily Note plugin to create the note for you, templates will work the same way as if it was triggered from within Obsidian.
+- `:ObsidianBridgeOpenGraph` opens the graph view in Obsidian, as long as the Graph core plugin is enabled.
+- `:ObsidianBridgeOpenVaultMenu` opens the Obsidian vault selection dialog. Obsidian does not expose a way to switch to another vault programmatically (yet?).
+- `:ObsidianBridgeTelescopeCommand` lists all the executable commands in Telescope. Execute the selected one.
 
 :bulb: Feel free to suggest additional useful commands via issue or PR.
 
@@ -114,7 +115,7 @@ Pass a config table as parameter to the setup function to provide an alternative
 
 Ideally scrolling within a note in neovim should also make the scroll position be centered in Obsidian. This is possible, but requires a patched version of [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) so we'll have to build it ourselves. For more info about the patch's status see this [discussion](https://github.com/coddingtonbear/obsidian-local-rest-api/discussions/75).
 
-#### Two ways of doing this, either build the fork or patch your local version
+#### Two ways of doing this, either use BRAT build or build the forked version
 
 ##### A) Use BRAT to install my forked version of obsidian-local-rest-api
 
@@ -128,7 +129,7 @@ Ideally scrolling within a note in neovim should also make the scroll position b
 
 Specifically what's required is a build based on [this fork](https://github.com/coddingtonbear/obsidian-local-rest-api/compare/main...oflisback:obsidian-local-rest-api:main) which hopefully can get integrated in the upstream project eventually.
 
-Start off by cloning the [patched fork](https://github.com/oflisback/obsidian-local-rest-api) to a folder named obsidian-local-rest-api-with-scroll: 
+Start off by cloning the [patched fork](https://github.com/oflisback/obsidian-local-rest-api) to a folder named obsidian-local-rest-api-with-scroll:
 
 ```
 git clone https://github.com/oflisback/obsidian-local-rest-api obsidian-local-rest-api-with-scroll
@@ -146,7 +147,7 @@ Now scrolling a note in neovim should also result in scrolling in Obsidian. Note
 
 ### :books: Other projects for Neovim + Obsidian
 
-* [obsidian.nvim](https://github.com/epwalsh/obsidian.nvim) Lets us interact with Obsidian vaults directly via the filesystem. :brain:
+- [obsidian.nvim](https://github.com/epwalsh/obsidian.nvim) Lets us interact with Obsidian vaults directly via the filesystem. :brain:
 
 ### :people_holding_hands: Contributing
 
