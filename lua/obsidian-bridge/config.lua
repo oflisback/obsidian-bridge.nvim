@@ -2,6 +2,8 @@ local M = {}
 
 M.api_key_env_var_name = "OBSIDIAN_REST_API_KEY"
 
+M.on = true
+
 M.get_final_config = function(user_config)
 	local default_config = {
 		obsidian_server_address = "http://localhost:27123",

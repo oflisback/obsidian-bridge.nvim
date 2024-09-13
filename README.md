@@ -108,6 +108,9 @@ Pass a config table as parameter to the setup function to provide an alternative
 - `:ObsidianBridgeOpenGraph` opens the graph view in Obsidian, as long as the Graph core plugin is enabled.
 - `:ObsidianBridgeOpenVaultMenu` opens the Obsidian vault selection dialog. Obsidian does not expose a way to switch to another vault programmatically (yet?).
 - `:ObsidianBridgeTelescopeCommand` lists all the executable commands in Telescope. Execute the selected one.
+- `:ObsidianBridgeOn` activate plugin.
+- `:ObsidianBridgeOff` deactivate plugin, this will prevent calls towards Obsidian.
+- `:ObsidianBridgeToggle` toggle plugin active/inactive.
 
 :bulb: Feel free to suggest additional useful commands via issue or PR.
 

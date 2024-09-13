@@ -45,6 +45,10 @@ local function get_active_buffer_obsidian_markdown_filename()
 end
 
 local function on_buf_enter()
+	if not config.on then
+		return
+	end
+
 	local filename = get_active_buffer_obsidian_markdown_filename()
 	if filename == nil then
 		return
@@ -62,6 +66,10 @@ local function on_buf_enter()
 end
 
 local function on_cursor_moved()
+	if not config.on then
+		return
+	end
+
 	if get_active_buffer_obsidian_markdown_filename() == nil then
 		return
 	end
