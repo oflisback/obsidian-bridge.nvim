@@ -4,12 +4,14 @@ M.api_key_env_var_name = "OBSIDIAN_REST_API_KEY"
 
 M.on = true
 
-M.get_final_config = function(user_config)
+M.final_config = nil
+
+M.create_final_config = function(user_config)
 	local default_config = {
 		obsidian_server_address = "http://localhost:27123",
 		scroll_sync = false,
 	}
-	return vim.tbl_extend("keep", user_config or {}, default_config)
+	M.final_config = vim.tbl_extend("keep", user_config or {}, default_config)
 end
 
 M.get_api_key = function()
