@@ -4,38 +4,51 @@ local network = require("obsidian-bridge.network")
 
 local M = {}
 
+local function echo_status(status)
+	vim.api.nvim_echo({ { status, "InfoMsg" } }, false, {})
+end
+
 M.register = function(configuration, api_key)
-	function ObsidianBridgeDailyNote()
+	local function execute_if_active(fn)
 		if config.on then
-			network.execute_command(configuration, api_key, "POST", "daily-notes")
-			-- would be neat if it also opened daily note
+			fn()
+		else
+			echo_status("obsidian-bridge is turned off, activate with :ObsidianBridgeOn")
 		end
 	end
+
+	function ObsidianBridgeDailyNote()
+		execute_if_active(function()
+			network.execute_command(configuration, api_key, "POST", "daily-notes")
+		end)
+		-- would be neat if it also opened daily note
+	end
 	vim.cmd("command! ObsidianBridgeDailyNote lua ObsidianBridgeDailyNote()")
+
 	function ObsidianBridgeTelescopeCommand()
-		if config.on then
+		execute_if_active(function()
 			network.telescope_command(configuration, api_key)
-		end
+		end)
 	end
 	vim.cmd("command! ObsidianBridgeTelescopeCommand lua ObsidianBridgeTelescopeCommand()")
 
 	function ObsidianBridgeOpenGraph()
-		if config.on then
+		execute_if_active(function()
 			network.execute_command(configuration, api_key, "POST", "graph:open")
-		end
+		end)
 	end
 	vim.cmd("command! ObsidianBridgeOpenGraph lua ObsidianBridgeOpenGraph()")
 
 	function ObsidianBridgeOpenVaultMenu()
-		if config.on then
+		execute_if_active(function()
 			network.execute_command(configuration, api_key, "POST", "app:open-vault")
-		end
+		end)
 	end
 	vim.cmd("command! ObsidianBridgeOpenVaultMenu lua ObsidianBridgeOpenVaultMenu()")
 
 	function ObsidianBridgeOn()
 		if not config.on then
-			vim.api.nvim_echo({ { "obsidian-bridge activated", "InfoMsg" } }, false, {})
+			echo_status("obsidian-bridge activated")
 			config.on = true
 			event_handlers.on_buf_enter()
 		end
@@ -44,7 +57,7 @@ M.register = function(configuration, api_key)
 
 	function ObsidianBridgeOff()
 		if config.on then
-			vim.api.nvim_echo({ { "obsidian-bridge deactivated", "InfoMsg" } }, false, {})
+			echo_status("obsidian-bridge deactivated")
 			config.on = false
 		end
 	end
