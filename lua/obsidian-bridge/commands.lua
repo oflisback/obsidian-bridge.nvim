@@ -1,4 +1,5 @@
 local config = require("obsidian-bridge.config")
+local event_handlers = require("obsidian-bridge.event_handlers")
 local network = require("obsidian-bridge.network")
 
 local M = {}
@@ -36,6 +37,7 @@ M.register = function(configuration, api_key)
 		if not config.on then
 			vim.api.nvim_echo({ { "obsidian-bridge activated", "InfoMsg" } }, false, {})
 			config.on = true
+			event_handlers.on_buf_enter()
 		end
 	end
 	vim.cmd("command! ObsidianBridgeOn lua ObsidianBridgeOn()")
