@@ -33,17 +33,27 @@ M.register = function(configuration, api_key)
 	vim.cmd("command! ObsidianBridgeOpenVaultMenu lua ObsidianBridgeOpenVaultMenu()")
 
 	function ObsidianBridgeOn()
-		config.on = true
+		if not config.on then
+			vim.api.nvim_echo({ { "obsidian-bridge activated", "InfoMsg" } }, false, {})
+			config.on = true
+		end
 	end
 	vim.cmd("command! ObsidianBridgeOn lua ObsidianBridgeOn()")
 
 	function ObsidianBridgeOff()
-		config.on = false
+		if config.on then
+			vim.api.nvim_echo({ { "obsidian-bridge deactivated", "InfoMsg" } }, false, {})
+			config.on = false
+		end
 	end
 	vim.cmd("command! ObsidianBridgeOff lua ObsidianBridgeOff()")
 
 	function ObsidianBridgeToggle()
-		config.on = not config.on
+		if config.on then
+			ObsidianBridgeOff()
+		else
+			ObsidianBridgeOn()
+		end
 	end
 	vim.cmd("command! ObsidianBridgeToggle lua ObsidianBridgeToggle()")
 end
