@@ -14,7 +14,7 @@ This is accomplished by leveraging the [Local REST API](https://github.com/coddi
 
 1. Make sure you have [curl](https://curl.se/) installed on your system and available on your `PATH`.
 
-2. Install and enable the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) community plugin in Obsidian. <span style="color: red;">Important:</span> The default configuration of obsidian-bridge.nvim will try to connect to the non-encrypted server variant so remember to enable that in the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) settings if you want to use it.
+2. Install and enable the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) community plugin in Obsidian. <span style="color: red;">Important:</span> The default configuration of obsidian-bridge.nvim will try to connect to the non-encrypted server variant so remember to enable that in the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) settings if you want to use it. _See SSL/HTTPS Setup below for more information._
 
 3. Set the environment variable `OBSIDIAN_REST_API_KEY` to the API key found in the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) settings within Obsidian, for example:
 
@@ -30,8 +30,9 @@ export OBSIDIAN_REST_API_KEY=<your api key, without the brackets>
 ```lua
 {
   "oflisback/obsidian-bridge.nvim",
-  dependencies = { "nvim-telescope/telescope.nvim" },
-  config = function() require("obsidian-bridge").setup() end,
+  opts = {
+    -- your config here
+  },
   event = {
     "BufReadPre *.md",
     "BufNewFile *.md",
@@ -39,7 +40,7 @@ export OBSIDIAN_REST_API_KEY=<your api key, without the brackets>
   lazy = true,
   dependencies = {
     "nvim-lua/plenary.nvim",
-  }
+  },
 }
 ```
 
@@ -80,25 +81,42 @@ If no config parameter is provided to the setup function this default configurat
 
 ```lua
 {
-  obsidian_server_address = "http://localhost:27123"
-  scroll_sync = false -- See "Sync of buffer scrolling" section below
+  obsidian_server_address = "http://localhost:27123",
+  scroll_sync = false, -- See "Sync of buffer scrolling" section below
+  cert_path = nil, -- See "SSL configuration" section below
 }
 ```
 
-Pass a config table as parameter to the setup function to provide an alternative server address, for example to use with lazy:
+Pass a config table as parameter to the setup function to provide an alternative server address or SSL certificate, for example to use with lazy:
 
 ```lua
 {
   "oflisback/obsidian-bridge.nvim",
   dependencies = { "nvim-telescope/telescope.nvim" },
-  config = function() require("obsidian-bridge").setup({
-    obsidian_server_address = "https://localhost:27124"
-  }) end,
+  opts = {
+    obsidian_server_address = "https://localhost:27124",
+    cert_path = "~/.ssl/my-bridge-cert.pem"
+  },
   event = {
     "BufReadPre *.md",
     "BufNewFile *.md",
   },
-  lazy = true
+  lazy = true,
+}
+```
+
+### :key: SSL/HTTPS Setup
+
+To use an encrypted connection, you will need the CA certificate from the Local REST API plugin. You can find it under Local REST API settings > Advanced Settings > Certificate. Kindly select and copy and entire text field, taking care **not** to accidentally modify it!
+
+Then, simply create a new file anywhere on your system, give it any name you please, and paste the certificate inside of it. Take note of the path to this file, because you will need to pass it to the obsidian-bridge configuration table.
+
+Don't forget to use the HTTPS URL for the server address! For example:
+
+```lua
+{
+    obsidian_server_address = "https://localhost:27124",
+    cert_path = "~/.ssl/my-bridge-cert.pem",
 }
 ```
 
