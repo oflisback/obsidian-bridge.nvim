@@ -18,11 +18,13 @@ local make_api_call = function(final_config, api_key, request_method, path, json
 	local url = final_config.obsidian_server_address .. path
 	local body = json_body and vim.fn.json_encode(json_body) or nil
 	local method = string.lower(request_method) or "post"
+	local raw_args = final_config.raw_args
 
 	local result = curl.request({
 		url = url,
 		method = method,
 		body = body,
+		raw = raw_args,
 		on_error = function(res)
 			-- Ignore other errors for now, for instance if we can't contact obsidian server it's
 			-- not running, that's often times probably intentional.
@@ -38,9 +40,7 @@ local make_api_call = function(final_config, api_key, request_method, path, json
 		local decoded = vim.fn.json_decode(result.body)
 		if decoded and decoded.errorCode == 40101 then
 			vim.api.nvim_err_writeln(
-				"Error: authentication error, please check your "
-					.. config.api_key_env_var_name
-					.. " value."
+				"Error: authentication error, please check your " .. config.api_key_env_var_name .. " value."
 			)
 		else
 			return decoded
