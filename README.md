@@ -16,11 +16,14 @@ This is accomplished by leveraging the [Local REST API](https://github.com/coddi
 
 2. Install and enable the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) community plugin in Obsidian. <span style="color: red;">Important:</span> The default configuration of obsidian-bridge.nvim will try to connect to the non-encrypted server variant so remember to enable that in the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) settings if you want to use it. _See SSL/HTTPS Setup below for more information._
 
-3. Set the environment variable `OBSIDIAN_REST_API_KEY` to the API key found in the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) settings within Obsidian, for example:
+3. Set the environment variable `OBSIDIAN_REST_API_KEY` to the API key found in the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) settings within Obsidian. For example:
 
+```bash
+# In your .bashrc or .zshrc
+export OBSIDIAN_REST_API_KEY="your_api_key_here"
 ```
-export OBSIDIAN_REST_API_KEY=<your api key, without the brackets>
-```
+
+<!-- TODO: Add link to instructions for storing the key securely for users that commit their dotfiles to git. -->
 
 4. Install `obsidian-bridge.nvim`, here are examples for some popular package managers:
 
@@ -77,48 +80,82 @@ Plug 'oflisback/obsidian-bridge.nvim'
 
 ### :gear: Configuration
 
-If no config parameter is provided to the setup function this default configuration will be used:
+You have access to some configuration options. The table below represents the **default** settings. They will be used if you don't provide any settings.
+
+You may pass a config table as the argument to the `setup` function, _or_ set it as the `opts` field **iff** you are using `lazy.nvim`. Any given settings will **override** the defaults. Untouched defaults will be kept.
+
+If you change the server's address inside the Obsidian Local REST API settings, you _must_ set the correct `obsidian_server_address` in this plugin. If you wish to use SSL, you also need to pass a different address. When passing the address, make sure to copy it _directly_ from Obsidian into your `obsidian-bridge` configuration. Take care to **not** have any trailing slashes `/` after the port number!
 
 ```lua
-{
+-- default settings
+local bridge_settings = {
   obsidian_server_address = "http://localhost:27123",
   scroll_sync = false, -- See "Sync of buffer scrolling" section below
   cert_path = nil, -- See "SSL configuration" section below
+  warnings = true, -- Show misconfiguration warnings. Recommended to keep this on unless you know what you're doing!
 }
-```
 
-Pass a config table as parameter to the setup function to provide an alternative server address or SSL certificate, for example to use with lazy:
-
-```lua
-{
+-- If you are using lazy in your config,
+-- for example in lua/plugins/bridge.lua
+return {
   "oflisback/obsidian-bridge.nvim",
   dependencies = { "nvim-telescope/telescope.nvim" },
-  opts = {
-    obsidian_server_address = "https://localhost:27124",
-    cert_path = "~/.ssl/my-bridge-cert.pem"
-  },
+  opts = bridge_settings,
   event = {
     "BufReadPre *.md",
     "BufNewFile *.md",
   },
   lazy = true,
 }
+
+-- Or you may call setup directly:
+require("obsidian-bridge").setup(bridge_settings)
+-- Note: There's nothing special about the bridge_settings variable.
+-- You can pass a table directly if you prefer.
 ```
 
 ### :key: SSL/HTTPS Setup
 
-To use an encrypted connection, you will need the CA certificate from the Local REST API plugin. You can find it under Local REST API settings > Advanced Settings > Certificate. Kindly select and copy and entire text field, taking care **not** to accidentally modify it!
+#### Saving The Certificate
 
-Then, simply create a new file anywhere on your system, give it any name you please, and paste the certificate inside of it. Take note of the path to this file, because you will need to pass it to the obsidian-bridge configuration table.
+To use an encrypted connection, you will need the CA certificate from the Local REST API plugin. This is because the plugin's certificate is self-signed, and we must instruct `curl` to treat it as a trusted certificate authority.
 
-Don't forget to use the HTTPS URL for the server address! For example:
+> Note: The name and extension of the certificate file does not matter as long as its contents are correct!
+
+##### Save Directly
+
+You can find it under the Local REST API settings panel in Obsidian. Simply click the "this certificate" link as seen below to save the certificate file:
+
+![Get SSL cert directly](assets/cert-a.png)
+
+Next, move the file to any location on your system, and **remember the path** because you will need it for the next step. \_It is not recommended to store it among your dotfiles if you track them with `git`, `~/.ssl/obsidian.crt` works well.
+
+##### Copy Into File
+
+In certain Linux environments, the above link _might_ not do anything. In that case, you can copy the certificate's contents from the settings panel directly. You need to enable the "Advanced Settings" option at the bottom of the settings panel:
+
+![REST API Advanced Options](assets/cert-b-1.png)
+
+Next, scroll to the bottom and look for the `Certificate` field. Take care to select the **entire** contents of the text box and copy it to your clipboard **without** modifying it.
+
+![REST API Advanced Options](assets/cert-b-2.png)
+
+Then, simply create a new file anywhere on your system (`~/.ssl/obsidian.crt` works well), and paste the certificate inside of it. As above, remember this path!
+
+#### Configuring `obsidian-bridge`
+
+Now that you've saved the certificate, you need to point `obsidian-bridge` to the correct HTTPS server address. The default address is shown below, and you can also find it in the REST API settings panel labeled "Encrypted (HTTPS) API URL". Please note that `localhost` will **not** work for SSL, and you **must** replace it with `127.0.0.1`!
+
+You also must set the `cert_path` option to the _full_ path to the certificate file you saved in the previous step:
 
 ```lua
-{
-    obsidian_server_address = "https://localhost:27124",
-    cert_path = "~/.ssl/my-bridge-cert.pem",
+opts = {
+    obsidian_server_address = "https://127.0.0.1:27124",
+    cert_path = "~/.ssl/obsidian.crt",
 }
 ```
+
+SSL should now be ready to use. `obsidian-bridge` will warn you about any detected misconfigurations when it's loaded.
 
 ### :keyboard: Commands
 
