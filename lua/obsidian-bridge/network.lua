@@ -25,10 +25,9 @@ local make_api_call = function(final_config, api_key, request_method, path, json
 		method = method,
 		body = body,
 		raw = raw_args,
-		on_error = function(res)
+		on_error = function()
 			-- Ignore other errors for now, for instance if we can't contact obsidian server it's
 			-- not running, that's often times probably intentional.
-			print(res.message)
 		end,
 		headers = {
 			content_type = "application/json",

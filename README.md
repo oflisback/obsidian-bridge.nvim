@@ -80,11 +80,7 @@ Plug 'oflisback/obsidian-bridge.nvim'
 
 ### :gear: Configuration
 
-You have access to some configuration options. The table below represents the **default** settings. They will be used if you don't provide any settings.
-
-You may pass a config table as the argument to the `setup` function, _or_ set it as the `opts` field **iff** you are using `lazy.nvim`. Any given settings will **override** the defaults. Untouched defaults will be kept.
-
-If you change the server's address inside the Obsidian Local REST API settings, you _must_ set the correct `obsidian_server_address` in this plugin. If you wish to use SSL, you also need to pass a different address. When passing the address, make sure to copy it _directly_ from Obsidian into your `obsidian-bridge` configuration. Take care to **not** have any trailing slashes `/` after the port number!
+If you change the server's address inside the Obsidian Local REST API settings, you _must_ set the correct `obsidian_server_address` in this plugin. If you wish to use SSL, you also need to pass a different address. When passing the address, make sure to copy it _directly_ from Obsidian into your `obsidian-bridge` configuration. Take care to **not** have any trailing slashes `/` after the port number.
 
 ```lua
 -- default settings
@@ -92,7 +88,7 @@ local bridge_settings = {
   obsidian_server_address = "http://localhost:27123",
   scroll_sync = false, -- See "Sync of buffer scrolling" section below
   cert_path = nil, -- See "SSL configuration" section below
-  warnings = true, -- Show misconfiguration warnings. Recommended to keep this on unless you know what you're doing!
+  warnings = true, -- Show misconfiguration warnings
 }
 
 -- If you are using lazy in your config,
@@ -124,11 +120,11 @@ To use an encrypted connection, you will need the CA certificate from the Local 
 
 ##### Save Directly
 
-You can find it under the Local REST API settings panel in Obsidian. Simply click the "this certificate" link as seen below to save the certificate file:
+You can find it under the Local REST API settings panel in Obsidian. Click the "this certificate" link as seen below to save the certificate file:
 
 ![Get SSL cert directly](assets/cert-a.png)
 
-Next, move the file to any location on your system, and **remember the path** because you will need it for the next step. \_It is not recommended to store it among your dotfiles if you track them with `git`, `~/.ssl/obsidian.crt` works well.
+Next, move the file to a temporary location or e.g. `~/.ssl/obsidian.crt`.
 
 ##### Copy Into File
 
