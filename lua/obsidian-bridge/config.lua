@@ -69,6 +69,13 @@ local function check_for_ssl_errors(final)
 	end
 end
 
+local function check_picker(final)
+	local network = require("obsidian-bridge.network")
+	if not network.pickers[final.picker] then
+		vim.notify('Invalid picker: "' .. final.picker .. '"', vim.log.levels.ERROR)
+	end
+end
+
 M.create_final_config = function(user_config)
 	local default_config = {
 		obsidian_server_address = "http://localhost:27123",
@@ -90,12 +97,14 @@ M.create_final_config = function(user_config)
 	final.cert_path = normalize_certpath(final.cert_path)
 	-- check for misconfigurations, warn the user if found
 	check_for_ssl_errors(final)
+	-- check for the selected picker
 	check_url(final)
 	-- empty table if cert_path == nil
 	-- extendable, other curl args can go here
 	final.raw_args = construct_raw_args({
 		["--cacert"] = final.cert_path,
 	})
+	check_picker(final)
 	M.final_config = final
 end
 
