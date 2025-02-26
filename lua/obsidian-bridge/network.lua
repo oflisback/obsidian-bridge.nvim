@@ -2,11 +2,6 @@ local M = {}
 local config = require("obsidian-bridge.config")
 local curl = require("plenary.curl")
 local uri = require("obsidian-bridge.uri")
-local pickers = require("telescope.pickers")
-local finders = require("telescope.finders")
-local telescope_conf = require("telescope.config").values
-local actions = require("telescope.actions")
-local action_state = require("telescope.actions.state")
 
 -- Makes an API call to the local REST plugin
 -- @param final_config
@@ -65,7 +60,7 @@ M.execute_command = function(final_config, api_key, request_method, command)
 	return make_api_call(final_config, api_key, request_method, path)
 end
 
-M.telescope_command = function(final_config, api_key)
+M.pick_command = function(final_config, api_key)
 	local commands = M.execute_command(final_config, api_key, "GET", "")
 	if commands == nil or commands.commands == nil then
 		vim.notify("Get commands list failed")
@@ -79,27 +74,58 @@ M.telescope_command = function(final_config, api_key)
 		table.insert(command_names, command.name)
 	end
 
-	local obsidian_commands = function(opts)
-		opts = opts or {}
-		pickers
-			.new(opts, {
-				prompt_title = "Obsidian Commands",
-				finder = finders.new_table({
-					results = command_names,
-				}),
-				sorter = telescope_conf.generic_sorter(opts),
-				attach_mappings = function(prompt_bufnr, _)
-					actions.select_default:replace(function()
-						actions.close(prompt_bufnr)
-						local selection = action_state.get_selected_entry()
-						M.execute_command(final_config, api_key, "POST", command_name_id_map[selection[1]])
-					end)
-					return true
-				end,
-			})
-			:find()
+	if final_config.picker == "telescope" then
+		if not pcall(require, "telescope") then
+			vim.notify("telescope.nvim is not installed")
+			return
+		end
+
+		local pickers = require("telescope.pickers")
+		local finders = require("telescope.finders")
+		local telescope_conf = require("telescope.config").values
+		local actions = require("telescope.actions")
+		local action_state = require("telescope.actions.state")
+
+		local obsidian_commands = function(opts)
+			opts = opts or {}
+			pickers
+				.new(opts, {
+					prompt_title = "Obsidian Commands",
+					finder = finders.new_table({
+						results = command_names,
+					}),
+					sorter = telescope_conf.generic_sorter(opts),
+					attach_mappings = function(prompt_bufnr, _)
+						actions.select_default:replace(function()
+							actions.close(prompt_bufnr)
+							local selection = action_state.get_selected_entry()
+							M.execute_command(final_config, api_key, "POST", command_name_id_map[selection[1]])
+						end)
+						return true
+					end,
+				})
+				:find()
+		end
+		obsidian_commands(require("telescope.themes").get_dropdown({}))
+	elseif final_config.picker == "fzf-lua" then
+		if not pcall(require, "fzf-lua") then
+			vim.notify("fzf-lua is not installed")
+			return
+		end
+
+		local fzf_lua = require("fzf-lua")
+
+		local opts = {}
+		opts.prompt = "Obsidian Commands>"
+		opts.actions = {
+			["default"] = function(selected)
+				local cmd_id = command_name_id_map[selected[1]]
+				M.execute_command(final_config, api_key, "POST", cmd_id)
+			end,
+		}
+
+		fzf_lua.fzf_exec(command_names, opts)
 	end
-	obsidian_commands(require("telescope.themes").get_dropdown({}))
 end
 
 M.open_in_obsidian = function(filename, final_config, api_key)

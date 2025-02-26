@@ -25,12 +25,12 @@ M.register = function(configuration, api_key)
 	end
 	vim.cmd("command! ObsidianBridgeDailyNote lua ObsidianBridgeDailyNote()")
 
-	function ObsidianBridgeTelescopeCommand()
+	function ObsidianBridgePickCommand()
 		execute_if_active(function()
-			network.telescope_command(configuration, api_key)
+			network.pick_command(configuration, api_key)
 		end)
 	end
-	vim.cmd("command! ObsidianBridgeTelescopeCommand lua ObsidianBridgeTelescopeCommand()")
+	vim.cmd("command! ObsidianBridgePickCommand lua ObsidianBridgePickCommand()")
 
 	function ObsidianBridgeOpenGraph()
 		execute_if_active(function()
