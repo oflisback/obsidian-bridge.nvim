@@ -56,7 +56,8 @@ export OBSIDIAN_REST_API_KEY="your_api_key_here"
 require('packer').startup(function()
     use {
       'oflisback/obsidian-bridge.nvim',
-      requires = { "nvim-telescope/telescope.nvim" }
+      requires = { "nvim-telescope/telescope.nvim" },
+      -- requires = { "ibhagwan/fzf-lua" }, -- For picker = "fzf_lua" (see below)
       config = function() require('obsidian-bridge').setup() end
       requires = {
         "nvim-lua/plenary.nvim",
@@ -72,6 +73,8 @@ end)
 
 ```vim
 Plug 'nvim-telescope/telescope.nvim'
+" For picker = "fzf_lua" (see below)
+" Plug 'ibhagwan/fzf-lua' 
 Plug 'oflisback/obsidian-bridge.nvim'
   Plug 'nvim-lua/plenary.nvim'
 ```
@@ -89,6 +92,7 @@ local bridge_settings = {
   scroll_sync = false, -- See "Sync of buffer scrolling" section below
   cert_path = nil, -- See "SSL configuration" section below
   warnings = true, -- Show misconfiguration warnings
+  picker = "telescope", -- Picker to use with ObsidianBridgePickCommand ("telescope" | "fzf_lua")
 }
 
 -- If you are using lazy in your config,
@@ -96,6 +100,7 @@ local bridge_settings = {
 return {
   "oflisback/obsidian-bridge.nvim",
   dependencies = { "nvim-telescope/telescope.nvim" },
+  -- dependencies = { "ibhagwan/fzf-lua" }, -- For picker = "fzf_lua"
   opts = bridge_settings,
   event = {
     "BufReadPre *.md",
@@ -158,7 +163,7 @@ SSL should now be ready to use. `obsidian-bridge` will warn you about any detect
 - `:ObsidianBridgeDailyNote` takes you to your daily note or generates it for you if it doesn't already exist. Make sure to have the Daily Notes core plugin enabled in Obsidian for this to work. Since it internally uses the Daily Note plugin to create the note for you, templates will work the same way as if it was triggered from within Obsidian.
 - `:ObsidianBridgeOpenGraph` opens the graph view in Obsidian, as long as the Graph core plugin is enabled.
 - `:ObsidianBridgeOpenVaultMenu` opens the Obsidian vault selection dialog. Obsidian does not expose a way to switch to another vault programmatically (yet?).
-- `:ObsidianBridgeTelescopeCommand` lists all the executable commands in Telescope. Execute the selected one.
+- `:ObsidianBridgePickCommand` lists all the executable commands with the configured `picker`. Execute the selected one.
 - `:ObsidianBridgeOn` activate plugin.
 - `:ObsidianBridgeOff` deactivate plugin, this will prevent calls towards Obsidian.
 - `:ObsidianBridgeToggle` toggle plugin active/inactive.
