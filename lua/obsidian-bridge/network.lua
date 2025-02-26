@@ -60,72 +60,83 @@ M.execute_command = function(final_config, api_key, request_method, command)
 	return make_api_call(final_config, api_key, request_method, path)
 end
 
+M.pickers = {
+	telescope = {
+		requires = "telescope",
+		display_name = "telescope.nvim",
+		pick = function(command_name_id_map, cb)
+			local pickers = require("telescope.pickers")
+			local finders = require("telescope.finders")
+			local telescope_conf = require("telescope.config").values
+			local actions = require("telescope.actions")
+			local action_state = require("telescope.actions.state")
+
+			local obsidian_commands = function(opts)
+				opts = opts or {}
+				pickers
+					.new(opts, {
+						prompt_title = "Obsidian Commands",
+						finder = finders.new_table({
+							results = vim.tbl_keys(command_name_id_map),
+						}),
+						sorter = telescope_conf.generic_sorter(opts),
+						attach_mappings = function(prompt_bufnr, _)
+							actions.select_default:replace(function()
+								actions.close(prompt_bufnr)
+								local selection = action_state.get_selected_entry()
+								cb(command_name_id_map[selection[1]])
+							end)
+							return true
+						end,
+					})
+					:find()
+			end
+			obsidian_commands(require("telescope.themes").get_dropdown({}))
+		end,
+	},
+	fzf_lua = {
+		requires = "fzf-lua",
+		display_name = "fzf-lua",
+		pick = function(command_name_id_map, cb)
+			local fzf_lua = require("fzf-lua")
+
+			local opts = {
+				prompt = "Obsidian Commands>",
+				actions = {
+					["default"] = function(selected)
+						cb(command_name_id_map[selected[1]])
+					end,
+				},
+			}
+
+			fzf_lua.fzf_exec(vim.tbl_keys(command_name_id_map), opts)
+		end,
+	},
+}
+
 M.pick_command = function(final_config, api_key)
+	local picker = M.pickers[final_config.picker]
+
+	if picker.plugin_name and not pcall(require, picker.requires) then
+		vim.notify(picker.display_name .. " is not installed")
+		return
+	end
+
 	local commands = M.execute_command(final_config, api_key, "GET", "")
 	if commands == nil or commands.commands == nil then
 		vim.notify("Get commands list failed")
 		return
 	end
 	commands = commands.commands
+
 	local command_name_id_map = {}
-	local command_names = {}
 	for _, command in pairs(commands) do
 		command_name_id_map[command.name] = command.id
-		table.insert(command_names, command.name)
 	end
 
-	if final_config.picker == "telescope" then
-		if not pcall(require, "telescope") then
-			vim.notify("telescope.nvim is not installed")
-			return
-		end
-
-		local pickers = require("telescope.pickers")
-		local finders = require("telescope.finders")
-		local telescope_conf = require("telescope.config").values
-		local actions = require("telescope.actions")
-		local action_state = require("telescope.actions.state")
-
-		local obsidian_commands = function(opts)
-			opts = opts or {}
-			pickers
-				.new(opts, {
-					prompt_title = "Obsidian Commands",
-					finder = finders.new_table({
-						results = command_names,
-					}),
-					sorter = telescope_conf.generic_sorter(opts),
-					attach_mappings = function(prompt_bufnr, _)
-						actions.select_default:replace(function()
-							actions.close(prompt_bufnr)
-							local selection = action_state.get_selected_entry()
-							M.execute_command(final_config, api_key, "POST", command_name_id_map[selection[1]])
-						end)
-						return true
-					end,
-				})
-				:find()
-		end
-		obsidian_commands(require("telescope.themes").get_dropdown({}))
-	elseif final_config.picker == "fzf-lua" then
-		if not pcall(require, "fzf-lua") then
-			vim.notify("fzf-lua is not installed")
-			return
-		end
-
-		local fzf_lua = require("fzf-lua")
-
-		local opts = {}
-		opts.prompt = "Obsidian Commands>"
-		opts.actions = {
-			["default"] = function(selected)
-				local cmd_id = command_name_id_map[selected[1]]
-				M.execute_command(final_config, api_key, "POST", cmd_id)
-			end,
-		}
-
-		fzf_lua.fzf_exec(command_names, opts)
-	end
+	picker.pick(command_name_id_map, function(picked_cmd)
+		M.execute_command(final_config, api_key, "POST", picked_cmd)
+	end)
 end
 
 M.open_in_obsidian = function(filename, final_config, api_key)
