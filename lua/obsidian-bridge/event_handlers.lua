@@ -5,13 +5,11 @@ local M = {}
 
 local function get_vault_name(path)
 	local current_path = vim.fn.expand(path)
-	while current_path ~= "/" do
-		local obsidian_folder = current_path .. "/.obsidian"
+	for dir in vim.fs.parents(current_path) do
+		local obsidian_folder = vim.fs.joinpath(dir, ".obsidian")
 		if vim.fn.isdirectory(obsidian_folder) == 1 then
-			local vault_name = obsidian_folder:match("/([^/]+)/%.obsidian$")
-			return vault_name:gsub("([^%w])", "%%%1")
+			return vim.fs.basename(dir)
 		end
-		current_path = vim.fn.fnamemodify(current_path, ":h")
 	end
 	return false
 end
