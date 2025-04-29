@@ -25,7 +25,7 @@ local function get_active_buffer_obsidian_markdown_filename()
 		filename_incl_path = string.gsub(filename_incl_path, "\\", "/")
 	end
 
-	local path = vim.fn.fnamemodify(filename_incl_path, ":p:h")
+	local path = vim.fn.fnamemodify(filename_incl_path, ":p")
 	local vault_name = get_vault_name(path)
 	if not vault_name then
 		return nil
