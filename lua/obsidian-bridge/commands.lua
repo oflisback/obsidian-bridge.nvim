@@ -1,6 +1,7 @@
 local config = require("obsidian-bridge.config")
 local event_handlers = require("obsidian-bridge.event_handlers")
 local network = require("obsidian-bridge.network")
+local utils = require("obsidian-bridge.utils")
 
 local M = {}
 
@@ -20,6 +21,7 @@ M.register = function(configuration, api_key)
 	function ObsidianBridgeDailyNote()
 		execute_if_active(function()
 			network.execute_command(configuration, api_key, "POST", "daily-notes")
+			vim.cmd(":ObsidianBridgeOpenCurrentActiveFile")
 		end)
 		-- would be neat if it also opened daily note
 	end
@@ -78,6 +80,19 @@ M.register = function(configuration, api_key)
 	end
 
 	vim.cmd("command! ObsidianBridgeToggle lua ObsidianBridgeToggle()")
+
+	function ObsidianBridgeOpenCurrentActiveFile()
+		execute_if_active(function()
+			local headers = network.make_api_call_get_request_headers(configuration, api_key, "HEAD", "/active/")
+			local currentActiveFilePath = utils.DecodeURI(headers["Content-Location"][1])
+			local joinedPathToOpen = utils.pathJoin(configuration.vault_path, currentActiveFilePath)
+
+			vim.cmd("e " .. joinedPathToOpen)
+		end)
+	end
+
+	vim.cmd("command! ObsidianBridgeOpenCurrentActiveFile lua ObsidianBridgeOpenCurrentActiveFile()")
+
 end
 
 return M

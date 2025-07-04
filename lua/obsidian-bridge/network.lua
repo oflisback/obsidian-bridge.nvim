@@ -1,7 +1,7 @@
 local M = {}
 local config = require("obsidian-bridge.config")
 local curl = require("plenary.curl")
-local uri = require("obsidian-bridge.uri")
+local utils = require("obsidian-bridge.utils")
 
 -- Makes an API call to the local REST plugin
 -- @param final_config
@@ -9,13 +9,13 @@ local uri = require("obsidian-bridge.uri")
 -- @param request_method valid value for plenary's curl.request method, "GET", "POST", etc
 -- @param path
 -- @param json_body
-local make_api_call = function(final_config, api_key, request_method, path, json_body)
+local make_api_call_get_raw = function(final_config, api_key, request_method, path, json_body)
 	local url = final_config.obsidian_server_address .. path
 	local body = json_body and vim.fn.json_encode(json_body) or nil
 	local method = string.lower(request_method) or "post"
 	local raw_args = final_config.raw_args
 
-	local result = curl.request({
+	return curl.request({
 		url = url,
 		method = method,
 		body = body,
@@ -29,6 +29,10 @@ local make_api_call = function(final_config, api_key, request_method, path, json
 			Authorization = "Bearer " .. api_key,
 		},
 	})
+end
+
+local make_api_call = function(final_config, api_key, request_method, path, json_body)
+	local result = make_api_call_get_raw(final_config, api_key, request_method, path, json_body)
 
 	if result.body and result.body ~= "" then
 		local decoded = vim.fn.json_decode(result.body)
@@ -42,6 +46,12 @@ local make_api_call = function(final_config, api_key, request_method, path, json
 	end
 end
 
+M.make_api_call_get_request_headers = function(final_config, api_key, request_method, path, json_body)
+	local result = make_api_call_get_raw(final_config, api_key, request_method, path, json_body)
+
+	return utils.parseRequestHeaders(result.headers)
+end
+
 M.scroll_into_view = function(line, final_config, api_key)
 	local json_body = {
 		center = true,
@@ -51,12 +61,12 @@ M.scroll_into_view = function(line, final_config, api_key)
 		},
 	}
 
-	local path = uri.EncodeURI("/editor/scroll-into-view")
+	local path = utils.EncodeURI("/editor/scroll-into-view")
 	return make_api_call(final_config, api_key, "POST", path, json_body)
 end
 
 M.execute_command = function(final_config, api_key, request_method, command)
-	local path = uri.EncodeURI("/commands/" .. command)
+	local path = utils.EncodeURI("/commands/" .. command)
 	return make_api_call(final_config, api_key, request_method, path)
 end
 
@@ -140,7 +150,7 @@ M.pick_command = function(final_config, api_key)
 end
 
 M.open_in_obsidian = function(filename, final_config, api_key)
-	local path = uri.EncodeURI("/open/" .. filename)
+	local path = utils.EncodeURI("/open/" .. filename)
 	make_api_call(final_config, api_key, "POST", path)
 end
 
