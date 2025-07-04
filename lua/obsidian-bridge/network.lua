@@ -143,6 +143,29 @@ M.pick_command = function(final_config, api_key)
 	end)
 end
 
+M.execute_command_by_name = function(final_config, api_key, command_name)
+	local commands = M.execute_command(final_config, api_key, "GET", "")
+	if commands == nil or commands.commands == nil then
+		vim.notify("Get commands list failed")
+		return
+	end
+
+	local command_id = nil
+	for _, command in pairs(commands.commands) do
+		if command.name == command_name then
+			command_id = command.id
+			break
+		end
+	end
+
+	if command_id == nil then
+		vim.notify("Command " .. command_name .. " is not found")
+		return
+	end
+
+	M.execute_command(final_config, api_key, "POST", command_id)
+end
+
 M.open_in_obsidian = function(filename, final_config, api_key)
 	local path = utils.EncodeURI("/open/" .. filename)
 	make_api_call(final_config, api_key, "POST", path)
