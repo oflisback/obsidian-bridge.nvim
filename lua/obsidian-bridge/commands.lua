@@ -3,13 +3,14 @@ local event_handlers = require("obsidian-bridge.event_handlers")
 local network = require("obsidian-bridge.network")
 local utils = require("obsidian-bridge.utils")
 
+
 local M = {}
 
 local function echo_status(status)
 	vim.api.nvim_echo({ { status, "InfoMsg" } }, false, {})
 end
 
-M.register = function(configuration, api_key)
+M.register = function(configuration, api_key, module)
 	local function execute_if_active(fn)
 		if config.on then
 			fn()
@@ -93,6 +94,10 @@ M.register = function(configuration, api_key)
 
 	vim.cmd("command! ObsidianBridgeOpenCurrentActiveFile lua ObsidianBridgeOpenCurrentActiveFile()")
 
+	module.execute_command_by_name = function(command_name)
+		network.execute_command_by_name(configuration, api_key, command_name)
+	end
 end
+
 
 return M
