@@ -23,6 +23,7 @@ M.register = function(configuration, api_key)
 		end)
 		-- would be neat if it also opened daily note
 	end
+
 	vim.cmd("command! ObsidianBridgeDailyNote lua ObsidianBridgeDailyNote()")
 
 	function ObsidianBridgePickCommand()
@@ -30,6 +31,7 @@ M.register = function(configuration, api_key)
 			network.pick_command(configuration, api_key)
 		end)
 	end
+
 	vim.cmd("command! ObsidianBridgePickCommand lua ObsidianBridgePickCommand()")
 
 	function ObsidianBridgeOpenGraph()
@@ -37,6 +39,7 @@ M.register = function(configuration, api_key)
 			network.execute_command(configuration, api_key, "POST", "graph:open")
 		end)
 	end
+
 	vim.cmd("command! ObsidianBridgeOpenGraph lua ObsidianBridgeOpenGraph()")
 
 	function ObsidianBridgeOpenVaultMenu()
@@ -44,6 +47,7 @@ M.register = function(configuration, api_key)
 			network.execute_command(configuration, api_key, "POST", "app:open-vault")
 		end)
 	end
+
 	vim.cmd("command! ObsidianBridgeOpenVaultMenu lua ObsidianBridgeOpenVaultMenu()")
 
 	function ObsidianBridgeOn()
@@ -53,6 +57,7 @@ M.register = function(configuration, api_key)
 			event_handlers.on_buf_enter()
 		end
 	end
+
 	vim.cmd("command! ObsidianBridgeOn lua ObsidianBridgeOn()")
 
 	function ObsidianBridgeOff()
@@ -61,6 +66,7 @@ M.register = function(configuration, api_key)
 			config.on = false
 		end
 	end
+
 	vim.cmd("command! ObsidianBridgeOff lua ObsidianBridgeOff()")
 
 	function ObsidianBridgeToggle()
@@ -70,6 +76,7 @@ M.register = function(configuration, api_key)
 			ObsidianBridgeOn()
 		end
 	end
+
 	vim.cmd("command! ObsidianBridgeToggle lua ObsidianBridgeToggle()")
 end
 
