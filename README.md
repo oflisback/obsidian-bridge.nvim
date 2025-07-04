@@ -167,6 +167,7 @@ SSL should now be ready to use. `obsidian-bridge` will warn you about any detect
 - `:ObsidianBridgeOn` activate plugin.
 - `:ObsidianBridgeOff` deactivate plugin, this will prevent calls towards Obsidian.
 - `:ObsidianBridgeToggle` toggle plugin active/inactive.
+- `:ObsidianBridgeOpenCurrentActiveFile` open the file currently open in Obsidian in Neovim.
 
 :bulb: Feel free to suggest additional useful commands via issue or PR.
 

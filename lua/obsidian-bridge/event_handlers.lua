@@ -1,17 +1,11 @@
 local config = require("obsidian-bridge.config")
 local network = require("obsidian-bridge.network")
+local utils = require("obsidian-bridge.utils")
 
 local M = {}
 
-local function get_vault_name(path)
-	local current_path = vim.fn.expand(path)
-	for dir in vim.fs.parents(current_path) do
-		local obsidian_folder = vim.fs.joinpath(dir, ".obsidian")
-		if vim.fn.isdirectory(obsidian_folder) == 1 then
-			return vim.fs.basename(dir)
-		end
-	end
-	return false
+function escape_lua_pattern(s)
+	return s:gsub("(%W)", "%%%1")
 end
 
 local function get_active_buffer_obsidian_markdown_filename()
@@ -26,12 +20,12 @@ local function get_active_buffer_obsidian_markdown_filename()
 	end
 
 	local path = vim.fn.fnamemodify(filename_incl_path, ":p")
-	local vault_name = get_vault_name(path)
+	local vault_name = utils.getVaultName(path)
 	if not vault_name then
 		return nil
 	end
 
-	return filename_incl_path:match(".*/" .. vault_name .. "/(.*)")
+	return filename_incl_path:match(".*/" .. escape_lua_pattern(vault_name) .. "/(.*)")
 end
 
 function M.on_buf_enter()

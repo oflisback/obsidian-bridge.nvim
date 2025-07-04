@@ -3,19 +3,13 @@ local config = require("obsidian-bridge.config")
 local curl = require("plenary.curl")
 local utils = require("obsidian-bridge.utils")
 
--- Makes an API call to the local REST plugin
--- @param final_config
--- @param api_key
--- @param request_method valid value for plenary's curl.request method, "GET", "POST", etc
--- @param path
--- @param json_body
-local make_api_call = function(final_config, api_key, request_method, path, json_body)
+local curl_endpoint = function(final_config, api_key, request_method, path, json_body)
 	local url = final_config.obsidian_server_address .. path
 	local body = json_body and vim.fn.json_encode(json_body) or nil
 	local method = string.lower(request_method) or "post"
 	local raw_args = final_config.raw_args
 
-	local result = curl.request({
+	return curl.request({
 		url = url,
 		method = method,
 		body = body,
@@ -29,6 +23,10 @@ local make_api_call = function(final_config, api_key, request_method, path, json
 			Authorization = "Bearer " .. api_key,
 		},
 	})
+end
+
+local make_api_call = function(final_config, api_key, request_method, path, json_body)
+	local result = curl_endpoint(final_config, api_key, request_method, path, json_body)
 
 	if result.body and result.body ~= "" then
 		local decoded = vim.fn.json_decode(result.body)
@@ -40,6 +38,12 @@ local make_api_call = function(final_config, api_key, request_method, path, json
 			return decoded
 		end
 	end
+end
+
+M.make_api_call_get_request_headers = function(final_config, api_key, request_method, path, json_body)
+	local result = curl_endpoint(final_config, api_key, request_method, path, json_body)
+
+	return utils.parseRequestHeaders(result.headers)
 end
 
 M.scroll_into_view = function(line, final_config, api_key)

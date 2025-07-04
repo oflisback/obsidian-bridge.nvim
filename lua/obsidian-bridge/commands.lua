@@ -1,6 +1,7 @@
 local config = require("obsidian-bridge.config")
 local event_handlers = require("obsidian-bridge.event_handlers")
 local network = require("obsidian-bridge.network")
+local utils = require("obsidian-bridge.utils")
 
 local M = {}
 
@@ -20,6 +21,7 @@ M.register = function(configuration, api_key)
 	function ObsidianBridgeDailyNote()
 		execute_if_active(function()
 			network.execute_command(configuration, api_key, "POST", "daily-notes")
+			vim.cmd(":ObsidianBridgeOpenCurrentActiveFile")
 		end)
 		-- would be neat if it also opened daily note
 	end
@@ -82,10 +84,21 @@ M.register = function(configuration, api_key)
 	function ObsidianBridgeOpenCurrentActiveFile()
 		execute_if_active(function()
 			local headers = network.make_api_call_get_request_headers(configuration, api_key, "HEAD", "/active/")
-			local currentActiveFilePath = utils.DecodeURI(headers["Content-Location"][1])
-			local joinedPathToOpen = utils.pathJoin(configuration.vault_path, currentActiveFilePath)
+			local contentLocation = headers["Content-Location"] and headers["Content-Location"][1]
+			if not contentLocation then
+				vim.notify("Content-Location header not found", vim.log.levels.ERROR)
+				return
+			end
 
-			vim.cmd("e " .. joinedPathToOpen)
+			local decodedLocation = utils.DecodeURI(contentLocation)
+			local joinedPathToOpen = utils.pathJoin(utils.getVaultPath(), decodedLocation)
+
+			if not (vim.uv or vim.loop).fs_stat(joinedPathToOpen) then
+				vim.notify("File does not exist: " .. joinedPathToOpen, vim.log.levels.ERROR)
+				return
+			end
+
+			vim.cmd("e " .. vim.fn.fnameescape(joinedPathToOpen))
 		end)
 	end
 
