@@ -78,6 +78,8 @@ end
 
 M.create_final_config = function(user_config)
 	local default_config = {
+		-- Not required - cannot open file in neovim if not set
+		vault_path = nil,
 		obsidian_server_address = "http://localhost:27123",
 		scroll_sync = false,
 		-- Do not require cert by default

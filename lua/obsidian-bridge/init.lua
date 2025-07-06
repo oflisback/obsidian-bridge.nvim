@@ -14,7 +14,7 @@ function M.setup(user_config)
 	local api_key = config.get_api_key()
 
 	if api_key ~= nil then
-		commands.register(config.final_config, api_key)
+		commands.register(config.final_config, api_key, M)
 	end
 
 	api.nvim_create_autocmd("BufEnter", {
