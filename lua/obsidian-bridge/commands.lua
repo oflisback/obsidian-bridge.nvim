@@ -78,6 +78,18 @@ M.register = function(configuration, api_key)
 	end
 
 	vim.cmd("command! ObsidianBridgeToggle lua ObsidianBridgeToggle()")
+
+	function ObsidianBridgeOpenCurrentActiveFile()
+		execute_if_active(function()
+			local headers = network.make_api_call_get_request_headers(configuration, api_key, "HEAD", "/active/")
+			local currentActiveFilePath = utils.DecodeURI(headers["Content-Location"][1])
+			local joinedPathToOpen = utils.pathJoin(configuration.vault_path, currentActiveFilePath)
+
+			vim.cmd("e " .. joinedPathToOpen)
+		end)
+	end
+
+	vim.cmd("command! ObsidianBridgeOpenCurrentActiveFile lua ObsidianBridgeOpenCurrentActiveFile()")
 end
 
 return M

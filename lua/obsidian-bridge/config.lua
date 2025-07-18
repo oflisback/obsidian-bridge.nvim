@@ -113,9 +113,9 @@ M.get_api_key = function()
 	if api_key == nil then
 		vim.notify(
 			M.api_key_env_var_name
-			.. " environment variable is not set. Please set "
-			.. M.api_key_env_var_name
-			.. " in your shell configuration.",
+				.. " environment variable is not set. Please set "
+				.. M.api_key_env_var_name
+				.. " in your shell configuration.",
 			vim.log.levels.ERROR
 		)
 	end
